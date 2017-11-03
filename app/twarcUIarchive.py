@@ -26,7 +26,7 @@ def twittercrawl(id):
     with app.app_context():
         TWITTER = models.TWITTER.query.filter(models.TWITTER.row_id == id).first()
         if not os.path.isdir(os.path.join(ARCHIVE_BASEDIR,TWITTER.title)):
-            os.mkdir(os.path.join(ARCHIVE_BASEDIR,TWITTER.title))
+            os.makedirs(os.path.join(ARCHIVE_BASEDIR,TWITTER.title))
 
         logging.basicConfig(
             filename=os.path.join(os.path.join(ARCHIVE_BASEDIR,TWITTER.title), "archive.log"),
