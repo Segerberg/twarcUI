@@ -23,20 +23,7 @@ This is a inital sketch for an UI for [twarc](https://github.com/DocNow/twarc) a
 
 ## TODO
 
-Alot of code cleaning and optimizing
-
-Making the application standalone
-
-Adding relevant twarc utils eg. hydrate
-
-Sending media and urls through warcprox
-
-Functionality to make a rudimentary (SIP, AIP), maybe just a bagit bag?
-
-Make template for docnows datasets.yml
-
-...
-
+Alot of code cleaning and optimizing. See Github issues for work in progress.
 
 
 
