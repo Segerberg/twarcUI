@@ -64,7 +64,7 @@ def twittercrawl(id):
             last_id = None
 
         if TWITTER.targetType == "Search":
-            tweets = t.search(TWITTER.title, since_id=last_id)
+            tweets = t.search(TWITTER.searchString, since_id=last_id)
 
         elif TWITTER.targetType == "User":
             #if re.match("^\d+$", TWITTER.title):

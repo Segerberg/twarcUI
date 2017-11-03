@@ -6,6 +6,7 @@ class TWITTER(db.Model):
     __tablename__ = 'TWITTER'
     row_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    searchString = db.Column(db.String(250), nullable=False)
     creator = db.Column(db.String(50))
     targetType = db.Column(db.String(50))
     description = db.Column(db.Text)
@@ -20,8 +21,9 @@ class TWITTER(db.Model):
     logs = db.relationship("CRAWLLOG", backref='twitter', lazy=True, cascade="save-update, merge, delete")
 
 
-    def __init__(self, title, creator, targetType, description, subject, status, lastCrawl, totalTweets, added, woeid, index,oldTweets):
+    def __init__(self, title, searchString, creator, targetType, description, subject, status, lastCrawl, totalTweets, added, woeid, index,oldTweets):
         self.title = title
+        self.searchString = searchString
         self.creator = creator
         self.targetType = targetType
         self.description = description

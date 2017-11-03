@@ -56,6 +56,7 @@ $(function () {
   <li><b style="color:grey">Index</b> {{ TWITTER.index }}</li>
 {% else %}
  <li><b style="color:grey"> Title:</b> {{ TWITTER.title }}</li>
+    <li><b style="color:grey"> Search String:</b> {{ TWITTER.searchString }}</li>
     <li><b style="color:grey"> Creator:</b> {{ TWITTER.creator }}</li>
     <li><b style="color:grey"> Keywords:</b> {{ TWITTER.subject }}</li>
  <li><b style="color:grey"> Description</b> {{ TWITTER.description }}</li>
@@ -88,6 +89,12 @@ $(function () {
 <label for="title"data-toggle="popover" title="Title" data-placement="left" data-content="TBD">Title</label>
     {{form.title(class="form-control",id="title")}}
   </div>
+   {% if TWITTER.targetType == 'Search' %}
+  <div class="form-group">
+    <label for="searchString" data-toggle="popover" title="searchString" data-placement="left" data-content="TBD">Search String</label>
+    {{form.searchString(class="form-control", id="searchString")}}
+  </div>
+   {% endif %}
  <div class="form-group">
     <label for="tagcreator" data-toggle="popover" title="tagcreator" data-placement="left" data-content="TBD">Creator</label>
     {{form.creator(class="form-control", id="tagcrator")}}

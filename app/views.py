@@ -60,7 +60,7 @@ def twittertargets():
         try:
 
 
-            addTarget = models.TWITTER(title=form.title.data, creator=form.creator.data, targetType='User',
+            addTarget = models.TWITTER(title=form.title.data, searchString='', creator=form.creator.data, targetType='User',
                                        description=form.description.data, subject=form.subject.data, status=form.status.data,lastCrawl=None, totalTweets=0,
                                        added=datetime.now(), woeid=None, index=form.index.data, oldTweets=None)
 
@@ -82,11 +82,11 @@ def twittertargets():
 @app.route('/twittersearchtargets', methods=['GET', 'POST'])
 def twittersearchtargets():
     TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType=='Search')
-
+    templateType = "Search"
     form = twitterTargetForm(prefix='form')
     if request.method == 'POST'and form.validate_on_submit():
         try:
-            addTarget = models.TWITTER(title=form.title.data, creator=form.creator.data, targetType='Search',
+            addTarget = models.TWITTER(title=form.title.data, searchString=form.searchString.data, creator=form.creator.data, targetType='Search',
                                        description=form.description.data, subject=form.subject.data,
                                        status=form.status.data, lastCrawl=None, totalTweets=0,
                                        added=datetime.now(), woeid=None, index=form.index.data, oldTweets=None)
@@ -104,7 +104,7 @@ def twittersearchtargets():
 
 
 
-    return render_template("twittersearchtargets.html", TWITTER=TWITTER, form=form)
+    return render_template("twittertargets.html", TWITTER=TWITTER, form=form, templateType=templateType)
 
 
 
@@ -117,7 +117,7 @@ def userlist(id,page=1):
     form = twitterTargetForm(prefix='form')
     if request.method == 'POST' and form.validate_on_submit():
         try:
-            addTarget = models.TWITTER(title=form.title.data, creator=form.creator.data, targetType='User',
+            addTarget = models.TWITTER(title=form.title.data,searchString='' ,creator=form.creator.data, targetType='User',
                                        description=form.description.data, subject=form.subject.data,
                                        status=form.status.data, lastCrawl=None, totalTweets=0,
                                        added=datetime.now(), woeid=None, index=form.index.data, oldTweets=None)

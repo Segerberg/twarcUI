@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block pageHeader %}<i class="fa fa-twitter fa-fw"></i> USER TIMELINES
+{% block pageHeader %}<i class="fa fa-twitter fa-fw"></i>{% if templateType == "Search" %} API-SEARCHES{% else %}USER TIMELINES{% endif %}
                             <!-- Modal -->
                             <h5><div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -15,18 +15,25 @@
 
                                                    {{ form.hidden_tag() }}
 
-<label for="title"data-toggle="popover" title="Title" data-placement="left" data-content="TBD">Username</label>
+<label for="title"data-toggle="popover" title="Title" data-placement="left" data-content="TBD">{% if templateType == "Search" %} Title{% else %}Username{% endif %}</label>
     {{form.title(class="form-control",id="title")}}
   </div>
+   {% if templateType == "Search" %}
+   <div class="form-group">
+    <label for="searchString" data-toggle="popover" title="searchString" data-placement="left" data-content="TBD">Search String</label>
+    {{form.searchString(class="form-control", id="searchString")}}
+  </div>
+
+   {% endif %}
 
     <div class="form-group">
     <label for="tagcreator" data-toggle="popover" title="Creator" data-placement="left" data-content="TBD">Creator</label>
-    {{form.creator(class="form-control", id="tagcrator")}}
+    {{form.creator(class="form-control", id="tagcreator")}}
   </div>
 
   <div class="form-group">
     <label for="description" data-toggle="popover" title="Description" data-placement="left" data-content="TBD">Description</label>
-    {{form.description(class="form-control", id="creator")}}
+    {{form.description(class="form-control", id="description")}}
   </div>
   <div class="form-group">
     <label for="subject" data-toggle="popover" title="Subject" data-placement="left" data-content="TBD">Keywords</label>
@@ -83,7 +90,8 @@
 
         <thead>
              <tr>
-               <th>Username</th>
+                 {% if templateType == "Search" %} <th>Title</th>{% else %}<th>Username</th>{% endif %}
+
                 <th>Archived tweets</th>
                 <th>Last archived</th>
                  <th>Added</th>
