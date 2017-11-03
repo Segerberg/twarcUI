@@ -5,6 +5,12 @@ This is a inital sketch for an UI for [twarc](https://github.com/DocNow/twarc) a
 
 ## RUNNING
 
+    pip install pipenv
+
+    pipenv install
+
+    pipenv shell
+
     Edit config.py
 
     python db_create.py

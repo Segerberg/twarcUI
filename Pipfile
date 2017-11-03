@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+
+flask = "*"
+redislite = "*"
+rq = "*"
+sqlalchemy = "*"
+"flask-sqlalchemy" = "*"
+"flask-wtf" = "*"
+twarc = "*"
+"sqlalchemy-migrate" = "*"
+waitress = "*"
+
+
+[dev-packages]
