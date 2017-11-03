@@ -2,3 +2,4 @@
 redis.rdb*
 db_repository
 *.db
+jobs
