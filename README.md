@@ -23,7 +23,7 @@ This is a inital sketch for an UI for [twarc](https://github.com/DocNow/twarc) a
 
     python run.py
 
-##NAME AND LOGO
+## NAME AND LOGO
 The kurbits is an invented, fantastical symbol principally used for ornamentation in Swedish folk art
 and on painted furniture and domestic objects. Very popular between 1720 and 1870, particularly in Dalarna and southern Norrland.
 Dalecarlian horses, are probably the most famous artifacts painted in the kurbits style.
