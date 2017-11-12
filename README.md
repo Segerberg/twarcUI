@@ -5,7 +5,7 @@ UI for twarc
 <img height="200" src="https://github.com/Segerberg/twarcUI/blob/master/app/static/logo.png?raw=true">
 </div>
 
-This is a inital sketch for an UI for [twarc](https://github.com/DocNow/twarc) a Python library for archiving Twitter JSON data.
+This is a inital sketch and a work in progress for an UI for [twarc](https://github.com/DocNow/twarc) a Python library for archiving Twitter JSON data.
 
 ## RUNNING
 
