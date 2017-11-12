@@ -1,57 +1,52 @@
 {% extends "base.html" %}
 
-{% block pageHeader %}{% if templateType == "Search" %}<i class="fa fa-search fa-fw"></i> API-SEARCHES{% else %}<i class="fa fa-user fa-fw"></i>USER TIMELINES{% endif %}
+{% block pageHeader %}<i class="fa fa-archive fa-fw"></i> COLLECTIONS
                             <!-- Modal -->
                             <h5><div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                            <h4 class="modal-title" id="myModalLabel"><i class="fa fa-pencil" aria-hidden="true"></i> ADD TWITTER USER</h4>
+                                            <h4 class="modal-title" id="myModalLabel"><i class="fa fa-pencil" aria-hidden="true"></i> ADD COLLECTION</h4>
                                         </div>
                                         <div class="modal-body">
                                            <div class="form-group">
                                                <form action="" method="post" name="auth_name">
 
-                                                   {{ form.hidden_tag() }}
+                                                   {{ collectionForm.hidden_tag() }}
 
-<label for="title"data-toggle="popover" title="Title" data-placement="left" data-content="TBD">{% if templateType == "Search" %} Title{% else %}Username{% endif %}</label>
-    {{form.title(class="form-control",id="title")}}
-  </div>
-   {% if templateType == "Search" %}
-   <div class="form-group">
-    <label for="searchString" data-toggle="popover" title="searchString" data-placement="left" data-content="TBD">Search String</label>
-    {{form.searchString(class="form-control", id="searchString")}}
+<label for="title"data-toggle="popover" title="Title" data-placement="left" data-content="The title of the collection">Title</label>
+    {{collectionForm.title(class="form-control",id="title")}}
   </div>
 
-   {% endif %}
 
     <div class="form-group">
-    <label for="tagcreator" data-toggle="popover" title="Creator" data-placement="left" data-content="TBD">Creator</label>
-    {{form.creator(class="form-control", id="tagcreator")}}
+    <label for="tagcreator" data-toggle="popover" title="Creator" data-placement="left" data-content="The person who curates this collection e.g. Andreas Segerberg ">Curator</label>
+    {{collectionForm.curator (class="form-control", id="curator")}}
+  </div>
+
+      <div class="form-group">
+    <label for="collectionType" data-toggle="popover" title="Creator" data-placement="left" data-content="TBD">Collection Type</label>
+    {{collectionForm.collectionType (class="form-control", id="collectionType")}}
   </div>
 
   <div class="form-group">
     <label for="description" data-toggle="popover" title="Description" data-placement="left" data-content="TBD">Description</label>
-    {{form.description(class="form-control", id="description")}}
+    {{collectionForm.description(class="form-control", id="description")}}
   </div>
   <div class="form-group">
     <label for="subject" data-toggle="popover" title="Subject" data-placement="left" data-content="TBD">Keywords</label>
-    {{form.subject(class="form-control", id="contributor")}}
+    {{collectionForm.subject(class="form-control", id="contributor")}}
   </div>
 
 
    <div class="form-group">
     <label for="status" data-toggle="popover" title="tagettype" data-placement="left" data-content="TBD">Status</label>
-    {{form.status(class="form-control", id="status")}}
+    {{collectionForm.status(class="form-control", id="status")}}
   </div>
 
 
 
- <div class="form-group pull-left">
-    <label for="index" data-toggle="popover" title="tagettype" data-placement="left" data-content="TBD">Index</label>
-    {{form.index(class="form-control", id="index")}}
-  </div>
 
    <hr>
 
@@ -90,8 +85,7 @@
 
         <thead>
              <tr>
-                 {% if templateType == "Search" %} <th>Title</th>{% else %}<th>Username</th>{% endif %}
-
+                <th>Title</th>
                 <th>Archived tweets</th>
                 <th>Last archived</th>
                  <th>Added</th>
@@ -102,15 +96,15 @@
         </thead>
         <tbody>
 
-           {% for TARGET in TWITTER %}
+           {% for TARGET in COLLECTIONS %}
         <tr>
-            <td><a href="twittertargets/{{TARGET.row_id }}">{{ TARGET.title}}</td>
+            <td><a href="collectiondetail/{{TARGET.row_id }}">{{ TARGET.title}}</td>
             <td>{{ TARGET.totalTweets}}</td>
             {% if TARGET.lastCrawl == None %}<td>-</td>{% else %}<td>{{ TARGET.lastCrawl.strftime('%Y-%m-%d')}}</td>{% endif %}
 
             <td>{{ TARGET.added.strftime('%Y-%m-%d')}}</td>
             <td>{{ TARGET.subject}}</td>
-            <td><form method="post" onclick="return confirm('Är du säker på att du vill starta arkivering?');"action="{{ url_for('startTwitterCrawl', id=TARGET.row_id) }}">
+            <td><form method="post" onclick="return confirm('Are you sure you want to start archiving?');"action="{{ url_for('startCollectionCrawl', id=TARGET.row_id) }}">
   <button class="btn btn-success btn-xs pull-left"type="submit">Archive now!</i></button></form></td>
         </tr>
     {% endfor %}

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from app import app, render_template, request,db, url_for, redirect,flash
+from app import app, render_template, request,db, url_for, redirect,flash,Response
 from app import models
-from .forms import twitterTargetForm, SearchForm
+from .forms import twitterTargetForm, SearchForm, twitterCollectionForm, collectionAddForm
 from sqlalchemy.exc import IntegrityError
 from .twarcUIarchive import twittercrawl
 from config import POSTS_PER_PAGE, REDIS_DB
@@ -10,6 +10,7 @@ import os
 from datetime import datetime
 from redislite import Redis
 from rq import Queue
+import json
 
 q = Queue(connection=Redis(REDIS_DB))
 
@@ -19,19 +20,21 @@ def before_request():
 
 
 
-'''Index Route'''
+'''INDEX ROUTE'''
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     twitterUserCount = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType=='User').count()
     twitterSearchCount = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType == 'Search').count()
+    collectionCount = models.COLLECTION.query.filter(models.COLLECTION.status=='1').count()
     CRAWLLOG = models.CRAWLLOG.query.order_by(models.CRAWLLOG.row_id.desc()).limit(10).all()
     form = SearchForm()
     if request.method == 'POST':
         return redirect((url_for('search_results', form=form, query=form.search.data)))
 
-    return render_template("index.html", twitterUserCount=twitterUserCount, twitterSearchCount=twitterSearchCount, CRAWLLOG=CRAWLLOG, form=form)
+    return render_template("index.html", twitterUserCount=twitterUserCount, twitterSearchCount=twitterSearchCount, collectionCount=collectionCount, CRAWLLOG=CRAWLLOG, form=form)
 
+'''SEARCH'''
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     form =SearchForm()
@@ -40,7 +43,7 @@ def search():
     return render_template("search.html", form=form)
 
 
-'''Search results'''
+'''SEARCH RESULTS'''
 @app.route('/search/<query>/<int:page>', methods=['GET', 'POST'])
 def search_results(query,page=1):
     form = SearchForm()
@@ -50,6 +53,8 @@ def search_results(query,page=1):
 '''
 TWITTER
 '''
+
+'''USER-TIMELINES'''
 @app.route('/twittertargets', methods=['GET', 'POST'])
 def twittertargets():
     TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType=='User')
@@ -78,7 +83,7 @@ def twittertargets():
     return render_template("twittertargets.html", TWITTER=TWITTER, form=form)
 
 
-
+'''API-SEARCH-TARGETS'''
 @app.route('/twittersearchtargets', methods=['GET', 'POST'])
 def twittersearchtargets():
     TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType=='Search')
@@ -102,9 +107,35 @@ def twittersearchtargets():
             flash(u'Search is already in database! ', 'danger')
             db.session.rollback()
 
+    return render_template("twittertargets.html", TWITTER=TWITTER, form=form, templateType = templateType)
 
+'''COLLECTIONS'''
+@app.route('/collections', methods=['GET', 'POST'])
+def collections():
+    COLLECTIONS = models.COLLECTION.query.filter(models.COLLECTION.status == '1')
+    collectionForm = twitterCollectionForm(prefix='collectionForm')
+    if request.method == 'POST' and collectionForm.validate_on_submit():
+        try:
+            addTarget = models.COLLECTION(title=collectionForm.title.data, curator=collectionForm.curator.data,
+                                       collectionType=collectionForm.collectionType.data,
+                                       description=collectionForm.description.data, subject=collectionForm.subject.data,
+                                       status=collectionForm.status.data, lastCrawl=None,
+                                       totalTweets=0, added=datetime.now())
 
-    return render_template("twittertargets.html", TWITTER=TWITTER, form=form, templateType=templateType)
+            #addLog = models.CRAWLLOG(tag_title=form.title.data, event_start=datetime.now(),
+            #                         event_text='ADDED TO DB')
+            #addTarget.logs.append(addLog)
+            db.session.add(addTarget)
+            db.session.commit()
+            db.session.close()
+            back = models.COLLECTION.query.filter(models.COLLECTION.title == collectionForm.title.data).first()
+            return redirect(url_for('collectionDetail', id=back.row_id))
+
+        except IntegrityError:
+            flash(u'Collection name is already in use! ', 'danger')
+            db.session.rollback()
+
+    return render_template("collections.html", COLLECTIONS=COLLECTIONS, collectionForm=collectionForm)
 
 
 
@@ -144,10 +175,19 @@ def userlist(id,page=1):
 def twittertargetDetail(id):
 
     TWITTER = models.TWITTER.query.filter(models.TWITTER.row_id == id).first()
-    print (TWITTER.title)
     object = models.TWITTER.query.get_or_404(id)
     CRAWLLOG = models.CRAWLLOG.query.order_by(models.CRAWLLOG.row_id.desc()).filter(models.CRAWLLOG.tag_id==id)
     form = twitterTargetForm(prefix='form',obj=object)
+    assForm = collectionAddForm(prefix="assForm")
+    linkedCollections = models.TWITTER.query. \
+        filter(models.TWITTER.row_id == id). \
+        first(). \
+        tags
+    if request.method == 'POST' and assForm.validate_on_submit():
+        object.tags.append(assForm.assoc.data)
+        db.session.commit()
+        return redirect(url_for('twittertargetDetail', id=id))
+
 
     if request.method == 'POST' and form.validate_on_submit():
         try:
@@ -164,7 +204,96 @@ def twittertargetDetail(id):
         return redirect(url_for('twittertargetDetail',id=id))
 
 
-    return render_template("twittertargetdetail.html", TWITTER=TWITTER, form=form, CRAWLLOG=CRAWLLOG)
+
+    return render_template("twittertargetdetail.html", TWITTER=TWITTER, form=form, CRAWLLOG=CRAWLLOG, linkedCollections=linkedCollections, assForm=assForm)
+
+'''Route to detail view of collections'''
+@app.route('/collectiondetail/<id>', methods=['GET', 'POST'])
+def collectionDetail(id):
+    object = models.COLLECTION.query.get_or_404(id)
+    targets = models.TWITTER.query.all()
+    #CRAWLLOG = models.CRAWLLOG.query.order_by(models.CRAWLLOG.row_id.desc()).filter(models.CRAWLLOG.tag_id==id)
+    linkedTargets =  models.COLLECTION.query.\
+                    filter(models.COLLECTION.row_id==id).\
+                    first().\
+                    tags
+
+    collectionForm = twitterCollectionForm(prefix='collectionform',obj=object)
+    targetForm = twitterTargetForm(prefix='targetform')
+    searchApiForm = twitterTargetForm(prefix='searchapiform')
+
+
+
+    if request.method == 'POST' and collectionForm.validate_on_submit():
+        try:
+            collectionForm.populate_obj(object)
+            db.session.add(object)
+            db.session.commit()
+            db.session.close()
+            flash(u'Record saved! ', 'success')
+        except IntegrityError:
+            flash(u'Collection name is already in use!  ', 'danger')
+            db.session.rollback()
+        return redirect(url_for('collectionDetail',id=id))
+
+    if request.method == 'POST' and targetForm.validate_on_submit():
+        try:
+            addTarget = models.TWITTER(title=targetForm.title.data, searchString='', creator=targetForm.creator.data,
+                                       targetType='User',
+                                       description=targetForm.description.data, subject=targetForm.subject.data,
+                                       status=targetForm.status.data, lastCrawl=None, totalTweets=0,
+                                       added=datetime.now(), woeid=None, index=targetForm.index.data, oldTweets=None)
+
+            addLog = models.CRAWLLOG(tag_title=targetForm.title.data, event_start=datetime.now(), event_text='ADDED TO DB')
+            #addTarget.logs.append(addLog)
+            #db.session.add(addTarget)
+            object.tags.append(addTarget)
+            db.session.commit()
+            db.session.close()
+            flash(u'Record saved! ', 'success')
+        except IntegrityError:
+            flash(u'Collection name is already in use!  ', 'danger')
+            db.session.rollback()
+        return redirect(url_for('collectionDetail', id=id))
+
+
+    if request.method == 'POST' and searchApiForm.validate_on_submit():
+        try:
+            addTarget = models.TWITTER(title=searchApiForm.title.data, searchString=searchApiForm.searchString.data,
+                                       creator=searchApiForm.creator.data,
+                                       targetType='Search',
+                                       description=searchApiForm.description.data, subject=searchApiForm.subject.data,
+                                       status=searchApiForm.status.data, lastCrawl=None, totalTweets=0,
+                                       added=datetime.now(), woeid=None, index=searchApiForm.index.data,
+                                       oldTweets=None)
+
+            addLog = models.CRAWLLOG(tag_title=targetForm.title.data, event_start=datetime.now(),
+                                     event_text='ADDED TO DB')
+            # addTarget.logs.append(addLog)
+            # db.session.add(addTarget)
+            object.tags.append(addTarget)
+            db.session.commit()
+            db.session.close()
+
+            flash(u'Record saved! ', 'success')
+        except IntegrityError:
+            flash(u'Collection name is already in use!  ', 'danger')
+            db.session.rollback()
+        return redirect(url_for('collectionDetail', id=id))
+
+    return render_template("collectiondetail.html",  object = object, targets=targets,collectionForm=collectionForm, targetForm=targetForm,searchApiForm=searchApiForm, linkedTargets=linkedTargets)
+
+'''
+Route to add collection <--> target association
+'''
+@app.route('/addassociation/<id>/<target>', methods=['GET','POST'])
+def addCollectionAssociation(id, target):
+    object =  db.session.query(models.COLLECTION).get(id)
+    linkedTarget = db.session.query(models.TWITTER).filter(models.TWITTER.row_id == target).one()
+    object.tags.append(linkedTarget)
+    db.session.commit()
+
+    return redirect(url_for('collectionDetail', id=id))
 
 
 '''
@@ -180,6 +309,31 @@ def removeTwitterTarget(id):
         return redirect('/twittersearchtargets')
     else:
         return redirect('/twittertargets')
+
+'''
+Route to remove collection
+'''
+@app.route('/removecollection/<id>', methods=['POST'])
+def removeCollection(id):
+    object = models.COLLECTION.query.get_or_404(id)
+    db.session.delete(object)
+    db.session.commit()
+    db.session.close()
+
+    return redirect('/collections')
+
+'''
+Route to remove collection <--> target association
+'''
+
+@app.route('/removeassociation/<id>/<target>', methods=['GET','POST'])
+def removeCollectionAssociation(id, target):
+    object =  db.session.query(models.COLLECTION).get(id)
+    linkedTarget = db.session.query(models.TWITTER).filter(models.TWITTER.row_id == target).one()
+    object.tags.remove(linkedTarget)
+    db.session.commit()
+    return redirect(request.referrer)
+
 
 
 '''
@@ -201,11 +355,21 @@ def startTwitterCrawl(id):
         else:
             return redirect('/twittertargets')
 
-
-
-
-            
-
-
-
-
+'''
+Route to call collection twarc-archive
+'''
+@app.route('/startcollectioncrawl/<id>', methods=['GET','POST'])
+def startCollectionCrawl(id):
+    with app.app_context():
+        linkedTargets = models.COLLECTION.query. \
+            filter(models.COLLECTION.row_id == id). \
+            first(). \
+            tags
+        for target in linkedTargets:
+            last_crawl = models.TWITTER.query.get(target.row_id)
+            last_crawl.lastCrawl = datetime.now()
+            db.session.commit()
+            flash(u'Archiving started!',  'success')
+            q.enqueue(twittercrawl, target.row_id)
+        db.session.close()
+        return redirect(url_for('collectionDetail', id=id))

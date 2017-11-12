@@ -1,6 +1,11 @@
 from app import db, app
 
 
+assoc_twitter_collections = db.Table('ASSOC_TWITTER_COLLECTIONS',
+    db.Column('twitter_id', db.Integer, db.ForeignKey('TWITTER.row_id'), primary_key=True),
+    db.Column('collection_id', db.Integer, db.ForeignKey('COLLECTION.row_id'), primary_key=True)
+)
+
 
 class TWITTER(db.Model):
     __tablename__ = 'TWITTER'
@@ -19,6 +24,9 @@ class TWITTER(db.Model):
     index = db.Column(db.Boolean)
     oldTweets = db.Column(db.Boolean)
     logs = db.relationship("CRAWLLOG", backref='twitter', lazy=True, cascade="save-update, merge, delete")
+    tags = db.relationship('COLLECTION', secondary=assoc_twitter_collections,back_populates='tags', lazy='subquery')
+
+
 
 
     def __init__(self, title, searchString, creator, targetType, description, subject, status, lastCrawl, totalTweets, added, woeid, index,oldTweets):
@@ -35,6 +43,35 @@ class TWITTER(db.Model):
         self.index = index
         self.oldTweets = oldTweets
         self.totalTweets = totalTweets
+
+class COLLECTION(db.Model):
+    __tablename__ = 'COLLECTION'
+    row_id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    curator = db.Column(db.String(50))
+    collectionType = db.Column(db.String(250))
+    description = db.Column(db.Text)
+    subject = db.Column(db.String(50))
+    status = db.Column(db.String(50))
+    lastCrawl = db.Column(db.DateTime)
+    totalTweets = db.Column(db.Integer)
+    added = db.Column(db.DateTime)
+    tags = db.relationship('TWITTER', secondary=assoc_twitter_collections, lazy='subquery',back_populates='tags')
+
+
+    def __init__(self, title,  curator, collectionType, description, subject, status, lastCrawl, totalTweets, added):
+        self.title = title
+        self.curator = curator
+        self.collectionType = collectionType
+        self.description = description
+        self.subject = subject
+        self.status = status
+        self.lastCrawl = lastCrawl
+        self.added = added
+        self.totalTweets = totalTweets
+
+
+
 
 class CRAWLLOG(db.Model):
     __tablename__ = 'CRAWLLOG'
