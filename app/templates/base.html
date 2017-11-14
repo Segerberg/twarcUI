@@ -1,146 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>TwarcUI</title>
-
-    <!-- Bootstrap Core CSS -->
-    <link href="{{ url_for('static', filename = 'bower_components/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
-
-
-    <!-- SB-admin2 CSS -->
-    <link href="{{ url_for('static', filename = 'dist/css/sb-admin-2.css') }}" rel="stylesheet">
-
-
-    <!-- Font-Awesome -->
-    <link href="{{ url_for('static', filename = 'bower_components/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
-
-    <!-- Custom CSS -->
-    <link href="{{ url_for('static', filename = 'dist/css/twarcUI.css') }}" rel="stylesheet">
-
-    {% block head %}
-    {% endblock %}
-  </head>
-  <body>
-
- <div id="wrapper">
-
-        <!-- Navigation -->
-        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-               <!-- <a href="/" class="navbar-brand"><img src="{{ url_for('static', filename = 'logo_small.png') }}" width="50px" align="center">TwarcUI </a>-->
-                <a class="navbar-brand" href="/"><i class="fa fa-twitter fa-1x"></i> KURBITS TwarcUI</a>
-
-
-            </div>
-
-            <!-- /.navbar-header -->
-
-            <div class="navbar-default sidebar" role="navigation">
-                <div class="sidebar-nav navbar-collapse">
-                    <ul class="nav" id="side-menu">
-
-
-                            <!-- /input-group -->
-                        </li>
-                        <li>
-                            <a href="/"><i class="fa fa-university fa-fw"></i>Overview</a>
-                        </li>
-
-
-                        <li>
-                            <a href="/twittertargets"><i class="fa fa-twitter fa-fw"></i>Twitter<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="/twittertargets"><i class="fa fa-user fa-fw"></i>User Timelines</a>
-                                </li>
-                                <li>
-                                    <a href="/twittersearchtargets"><i class="fa fa-search fa-fw"></i>API-Searches</a>
-                                </li>
-                                 <li>
-                                    <a href="/collections"><i class="fa fa-archive fa-fw"></i>Collections</a>
-                                </li>
-                            </ul>
-                          </li>
-                        <li>
-                            <a href="#"><i class="fa fa-wrench fa-fw"></i>Tools</a>
-                        </li>
-                         <li>
-                            <a href="#"><i class="fa fa-cogs fa-fw"></i>Settings</a>
-                        </li>
-
-                    </ul>
-
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title>TwarcUI</title>
+        <!-- Font-Awesome -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css" rel="stylesheet"  type='text/css'>
+        <link href="{{ url_for('static', filename = 'bower_components/font-awesome/css/font-awesome.css') }}" rel="stylesheet">
+        <!-- Bootstrap Core CSS -->
+        <link href="{{ url_for('static', filename = 'bower_components/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+        <!-- SB-admin2 CSS -->
+        <link href="{{ url_for('static', filename = 'dist/css/sb-admin-2.css') }}" rel="stylesheet">
+        <!-- Custom CSS -->
+        <link href="{{ url_for('static', filename = 'dist/css/twarcUI.css') }}" rel="stylesheet">
+        {% block head %}
+        {% endblock %}
+        </head>
+    <body>
+        <div id="wrapper">
+            <!-- Navigation -->
+	        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+		        <div class="navbar-header">
+			        <a class="navbar-brand" href="/"><i class="fa fa-twitter fa-1x"></i> KURBITS TwarcUI</a>
                 </div>
-                <!-- /.sidebar-collapse -->
-<!-- Flashing messages:  (green), info (blue), warning (yellow), danger (red) -->
-   {% with messages = get_flashed_messages(with_categories=true) %}
+				<div class="navbar-default sidebar" role="navigation">
+					<div class="sidebar-nav navbar-collapse">
+						<ul class="nav" id="side-menu">
+							<li>
+								<a href="/"><i class="fa fa-university fa-fw"></i>Overview</a>
+							</li>
+							<li>
+								<a href="/twittertargets"><i class="fa fa-twitter fa-fw"></i>Twitter<span class="fa arrow"></span></a>
+							<ul class="nav nav-second-level">
+								<li>
+									<a href="/twittertargets"><i class="fa fa-user fa-fw"></i>User Timelines</a>
+								</li>
+								<li>
+									<a href="/twittersearchtargets"><i class="fa fa-search fa-fw"></i>API-Searches</a>
+								</li>
+								<li>
+									<a href="/collections"><i class="fa fa-archive fa-fw"></i>Collections</a>
+								</li>
+							</ul>
+							</li>
+							<li>
+								<a href="#"><i class="fa fa-wrench fa-fw"></i>Tools</a>
+							</li>
+							<li>
+								<a href="#"><i class="fa fa-cogs fa-fw"></i>Settings</a>
+							</li>
+						</ul>
+					</div>
 
-  {% if messages %}
-    {% for category, message in messages %}
-
-      <div class="alert alert-{{ category }} alert-dismissible" role="alert">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      <!-- <strong>Title</strong> --> {{ message }}
-      </div>
-                    </div></div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-            </div>
-            <!-- /.navbar-static-side -->
-
-        </nav>
-
-        <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">{% block pageHeader %}{% endblock %}</h1>
-                </div>
-
-                <!-- /.col-lg-12 -->
-            </div>
-            <div class="row">
-                <div class="col-lg-11">
-
-
-     <!-- jQuery -->
-    <script src="{{ url_for('static', filename = 'bower_components/jquery/dist/jquery.js') }}"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="{{ url_for('static', filename = 'bower_components/bootstrap/dist/js/bootstrap.min.js') }}"></script>
-
-    <!-- Metis Menu Plugin JavaScript -->
-    <script src="{{ url_for('static', filename = 'bower_components/metisMenu/dist/metisMenu.min.js') }}"></script>
-
-
-            <!-- DataTables JavaScript -->
-            <script src="{{ url_for('static', filename = 'bower_components/datatables/media/js/jquery.dataTables.min.js') }}"></script>
-           <script src="{{ url_for('static', filename = 'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js') }}"></script>
-
-    <!-- Custom Theme JavaScript -->
-    <script src="{{ url_for('static', filename = 'dist/js/sb-admin-2.js') }}"></script>
-
-    <script src="{{ url_for('static', filename = 'js/justgage.js') }}"></script>
-    <script src="{{ url_for('static', filename = 'js/raphael-2.1.4.min.js') }}"></script>
-
-  {% block content %}
-    {% endblock %}
-
-
-
-</body>
+					<!-- Flashing messages:  (green), info (blue), warning (yellow), danger (red) -->
+					{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+					{% for category, message in messages %}
+					<div class="alert alert-{{ category }} alert-dismissible" role="alert">
+						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						{{ message }}
+					</div>
+					{% endfor %}
+					{% endif %}
+					{% endwith %}
+				</div>
+	        </nav>
+            <!-- /Navigation -->
+		</div>
+		<div id="page-wrapper">
+			<div class="row">
+				<div class="col-lg-12">
+					<h1 class="page-header">{% block pageHeader %}{% endblock %}</h1>
+				</div>
+			</div>
+		<div class="row">
+			<div class="col-lg-11">
+			{% block content %}
+			{% endblock %}
+			</div>
+		</div>
+		 <!-- jQuery -->
+		<script src="{{ url_for('static', filename = 'bower_components/jquery/dist/jquery.js') }}"></script>
+		<!-- Bootstrap Core JavaScript -->
+		<script src="{{ url_for('static', filename = 'bower_components/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+		<!-- Metis Menu Plugin JavaScript -->
+		<script src="{{ url_for('static', filename = 'bower_components/metisMenu/dist/metisMenu.min.js') }}"></script>
+		<!-- DataTables JavaScript -->
+		<script src="{{ url_for('static', filename = 'bower_components/datatables/media/js/jquery.dataTables.min.js') }}"></script>
+		<script src="{{ url_for('static', filename = 'bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js') }}"></script>
+		<!-- Custom Theme JavaScript -->
+		<script src="{{ url_for('static', filename = 'dist/js/sb-admin-2.js') }}"></script>
+		<!-- Justgage JavaScript -->
+		<script src="{{ url_for('static', filename = 'js/justgage.js') }}"></script>
+		<!-- Raphael JavaScript -->
+		<script src="{{ url_for('static', filename = 'js/raphael-2.1.4.min.js') }}"></script>
+    </body>
 </html>
