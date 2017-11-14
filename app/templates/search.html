@@ -1,12 +1,7 @@
 {% extends "base.html" %}
 {% block home %}active{% endblock %}
-{% block pageHeader %}SÖK{% endblock %}
-
-
-
-{% block content %}
+{% block head %}
 <style>
-
 article.tweet {
       position: relative;
       float: left;
@@ -48,7 +43,23 @@ article.tweet {
       font-weight: heavy;
     }
 </style>
+ <script>(function($) {
+	$.fn.tweetify = function() {
+		this.each(function() {
+			$(this).html(
+			$(this).html().replace(/((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/gi, '<a href="$1">$1</a>').replace(/(^|\s)#([a-z0-9åäöA-ZÅÄÖ_]+)/g, '$1<a href="http://search.twitter.com/search?q=%23$2">#$2</a>').replace(/(^|\s)@(\w+)/g, '$1<a href="/usertweets/$2/1">@$2</a>'));
+		});
+		return $(this);
+	}
+})(jQuery);
 
+$('.twitter').tweetify();
+</script>
+{% endblock %}
+
+{% block pageHeader %}SÖK {% endblock %}
+
+{% block content %}
 <!--Search bar-->
 <div class="row" style="margin-top:20px;">
     {{ form.hidden_tag() }}
@@ -66,40 +77,21 @@ article.tweet {
 <hr>
 
 {% for result in results.items %}
-
-
  <article class="tweet">
-      <a href="{{ url_for('userlist', id=result.username, page=1)}}" class="name">{{result.screen_name}}</a><br>
-      <span class="username">@{{result.username}}</span><br>
-      <br>
-      <div class="twitter">{{result.text}}</div><br>
-      <footer>
-      <i class="fa fa-retweet fa-fw" ></i>{{result.retweets}}<br>
-      <a href="#"><time>{{result.created_at}}</time></a>
-      </footer>
-    </article>
-
-
+     <a href="{{ url_for('userlist', id=result.username, page=1)}}" class="name">{{result.screen_name}}</a><br>
+     <span class="username">@{{result.username}}</span><br>
+     <br>
+     <div class="twitter">{{result.text}}</div><br>
+     <footer>
+         <i class="fa fa-retweet fa-fw" ></i>{{result.retweets}}<br>
+         <a href="#"><time>{{result.created_at}}</time></a>
+     </footer>
+ </article>
 {% endfor %}
+
 <ul class = "pagination">
 {% if results.has_prev %}<li><a href="{{ url_for('search_results', page=results.prev_num, query=query) }}">&laquo;</a></li>{% else %}{% endif %}
-{% for page in results.iter_pages() %}
-    {% if page == None %} {% else %}  <li><a href="{{ url_for('search_results', page=page, query=query) }}">{{page}}</a></li>{% endif %}
-
-{% endfor %}
+{% for page in results.iter_pages() %}{% if page == None %} {% else %}  <li><a href="{{ url_for('search_results', page=page, query=query) }}">{{page}}</a></li>{% endif %}{% endfor %}
 {% if results.has_next %}<li><a href="{{ url_for('search_results', page=results.next_num, query=query) }}">&raquo;</a></li>{% else %}{% endif %}
-
 </ul>
- <script>(function($) {
-	$.fn.tweetify = function() {
-		this.each(function() {
-			$(this).html(
-			$(this).html().replace(/((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/gi, '<a href="$1">$1</a>').replace(/(^|\s)#([a-z0-9åäöA-ZÅÄÖ_]+)/g, '$1<a href="http://search.twitter.com/search?q=%23$2">#$2</a>').replace(/(^|\s)@(\w+)/g, '$1<a href="/usertweets/$2/1">@$2</a>'));
-		});
-		return $(this);
-	}
-})(jQuery);
-
-$('.twitter').tweetify();
-</script>
 {% endblock %}
