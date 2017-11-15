@@ -1,358 +1,21 @@
 {% extends "base.html" %}
-
 {% block pageHeader %}
 <i class="fa fa-archive fa-fw"></i> {{ object.title }}
-
 {% endblock %}
 {% block head %}
 <script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.11/js/dataTables.bootstrap.min.js"></script>
 <link href="https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.min.css" media="all" rel="stylesheet" type="text/css" />
-{% endblock %}
-{% block content %}
 <script>
  $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
-
 </script>
 <script>
 $(function () {
   $('[data-toggle="popover"]').popover()
 })
-
 </script>
-
-
-
-
-<div class="row">
-                <div class="col-lg-11">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-<i class="fa fa-archive fa-fw"></i> Collection Description
-
-                             <div class="form-group pull-right">                        <form method="post" onclick="return confirm('Are you sure you wan't to delete this collection?');"action="{{ url_for('removeCollection', id=object.row_id) }}">
-  <button class="btn btn-danger btn-xs pull-left"type="submit">Delete</i></button></form></div>
-  <div class="form-group pull-right">
-
-  <form method="post" onclick="return confirm('Are you sure you want to start archiving?');"action="{{ url_for('startCollectionCrawl', id=object.row_id) }}">
-  <button class="btn btn-success btn-xs pull-right"type="submit">Archive now!</i></button></form></div>
-                        </div>
-
-
-
-  <div class="panel-body">
-
-<h5><span class="label label-default">Description</span></h5>
-<ul class="list-unstyled">
-
- <li><b style="color:grey"> Title:</b> {{ object.title }}</li>
-    <li><b style="color:grey"> Curator:</b> {{ object.curator }}</li>
-    <li><b style="color:grey">Collection Type:</b> {{ object.collectionType }}</li>
-
- <li><b style="color:grey"> Description:</b> {{ object.description }}</li>
-    <li><b style="color:grey"> Keywords:</b> {{ object.subject }}</li>
-
-    <li><b style="color:grey">Status</b> {{ object.status }}</li>
-
-</ul>
-
-   </ul>
-
-
-                            <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#myModal">
-                               Edit
-                            </button>
-                            <!-- Modal -->
-                            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                            <h4 class="modal-title" id="myModalLabel"><i class="fa fa-pencil" aria-hidden="true"></i>EDIT</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                           <div class="form-group">
-                                               <form action="" method="post" name="auth_name">
-
-                                                   {{ collectionForm.hidden_tag() }}
-
-<label for="title"data-toggle="popover" title="Title" data-placement="left" data-content="TBD">Title</label>
-    {{collectionForm.title(class="form-control",id="title")}}
-  </div>
-     <div class="form-group">
-    <label for="tagcreator" data-toggle="popover" title="Creator" data-placement="left" data-content="TBD">Collection Type</label>
-    {{collectionForm.collectionType (class="form-control", id="collectionType")}}
-  </div>
- <div class="form-group">
-    <label for="tagcreator" data-toggle="popover" title="tagcreator" data-placement="left" data-content="TBD">Curator</label>
-    {{collectionForm.curator(class="form-control", id="tagcrator")}}
-  </div>
-    <div class="form-group">
-    <label for="description" data-toggle="popover" title="Description" data-placement="left" data-content="TBD">Description</label>
-    {{collectionForm.description(class="form-control", id="description")}}
-  </div>
-
- <div class="form-group">
-    <label for="subject" data-toggle="popover" title="Subject" data-placement="left" data-content="TBD">Keywords</label>
-    {{collectionForm.subject(class="form-control", id="subject")}}
-  </div>
-
-
-   <div class="form-group">
-    <label for="status" data-toggle="popover" title="Status" data-placement="left" data-content="TBD">Status</label>
-    {{collectionForm.status(class="form-control", id="status")}}
-  </div>
-
-
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                             <input class="btn btn-default" type="submit" value="Spara">
-                                        </div>
-                                    </div>
-                                     </form>
-                                    <!-- /.modal-content -->
-                                </div>
-                                <!-- /.modal-dialog -->
-                            </div>
-
-
-
-</div>
-</div>
-</div>
- <div class="row">
-     <!-- --------------------------------------------------- -->
-                            <!-- Modal -->
-                            <h5><div class="modal fade" id="targetModal" tabindex="-1" role="dialog" aria-labelledby="targetModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                            <h4 class="modal-title" id="targetModalLabel"><i class="fa fa-plus" aria-hidden="true"></i> TWITTER USER</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                           <div class="form-group">
-                                               <form action="" method="post" name="auth_name">
-
-                                                   {{ targetForm.hidden_tag() }}
-
-<label for="title"data-toggle="popover" title="Title" data-placement="left" data-content="TBD">Username</label>
-    {{targetForm.title(class="form-control",id="title")}}
-  </div>
-
-
-    <div class="form-group">
-    <label for="tagcreator" data-toggle="popover" title="Creator" data-placement="left" data-content="TBD">Creator</label>
-    {{targetForm.creator(class="form-control", id="tagcreator")}}
-  </div>
-
-  <div class="form-group">
-    <label for="description" data-toggle="popover" title="Description" data-placement="left" data-content="TBD">Description</label>
-    {{targetForm.description(class="form-control", id="description")}}
-  </div>
-  <div class="form-group">
-    <label for="subject" data-toggle="popover" title="Subject" data-placement="left" data-content="TBD">Keywords</label>
-    {{targetForm.subject(class="form-control", id="contributor")}}
-  </div>
-
-
-   <div class="form-group">
-    <label for="status" data-toggle="popover" title="tagettype" data-placement="left" data-content="TBD">Status</label>
-    {{targetForm.status(class="form-control", id="status")}}
-  </div>
-
-
-
- <div class="form-group pull-left">
-    <label for="index" data-toggle="popover" title="tagettype" data-placement="left" data-content="TBD">Index</label>
-    {{targetForm.index(class="form-control", id="index")}}
-  </div>
-
-   <hr>
-
-
-
- </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                             <input class="btn btn-default" type="submit" value="Save">
-                                        </div>
-                                    </div>
-                                     </form>
-                                    <!-- /.modal-content -->
-                                </div>
-                                <!-- /.modal-dialog -->
-                            </div></h5>
-
-   <!-- --------------------------------------------------- -->
-                            <!-- Modal -->
-                            <h5><div class="modal fade" id="searchApiModal" tabindex="-1" role="dialog" aria-labelledby="searchApiModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                            <h4 class="modal-title" id="searchApiModalLabel"><i class="fa fa-plus" aria-hidden="true"></i> TWITTER API-SEARCH</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                           <div class="form-group">
-                                               <form action="" method="post" name="auth_name">
-
-                                                   {{ searchApiForm.hidden_tag() }}
-
-<label for="title"data-toggle="popover" title="Title" data-placement="left" data-content="TBD">Title</label>
-    {{searchApiForm.title(class="form-control",id="title")}}
-  </div>
-
-    <div class="form-group">
-    <label for="searchString" data-toggle="popover" title="searchString" data-placement="left" data-content="TBD">Search String</label>
-    {{searchApiForm.searchString(class="form-control", id="searchString")}}
-  </div>
-
-    <div class="form-group">
-    <label for="tagcreator" data-toggle="popover" title="Creator" data-placement="left" data-content="TBD">Creator</label>
-    {{searchApiForm.creator(class="form-control", id="tagcreator")}}
-  </div>
-
-  <div class="form-group">
-    <label for="description" data-toggle="popover" title="Description" data-placement="left" data-content="TBD">Description</label>
-    {{searchApiForm.description(class="form-control", id="description")}}
-  </div>
-  <div class="form-group">
-    <label for="subject" data-toggle="popover" title="Subject" data-placement="left" data-content="TBD">Keywords</label>
-    {{searchApiForm.subject(class="form-control", id="contributor")}}
-  </div>
-
-
-   <div class="form-group">
-    <label for="status" data-toggle="popover" title="tagettype" data-placement="left" data-content="TBD">Status</label>
-    {{searchApiForm.status(class="form-control", id="status")}}
-  </div>
-
-
-
- <div class="form-group pull-left">
-    <label for="index" data-toggle="popover" title="tagettype" data-placement="left" data-content="TBD">Index</label>
-    {{searchApiForm.index(class="form-control", id="index")}}
-  </div>
-
-   <hr>
-
-
-
- </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                             <input class="btn btn-default" type="submit" value="Save">
-                                        </div>
-                                    </div>
-                                     </form>
-                                    <!-- /.modal-content -->
-                                </div>
-                                <!-- /.modal-dialog -->
-                            </div>
-  <!-- -------------------------------------- -->
-
-
-
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-
-                            <h3 class="panel-title pull-left"><a data-toggle="collapse" href="#collapse2"><i class="fa fa-crosshairs fa-fw"></i>ASSOCIATED TARGETS</a></h3>
-
-
-													<div class="clearfix"></div>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div id="collapse2" class="panel-collapse collapse in">
-                            <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered table-hover" id="dataTables-example">
-
-        <thead>
-            <tr>
-               <th>Title</th>
-               <th>Target Type</th>
-                <th>Actions</th>
-
-            </tr>
-        </thead>
-        <tbody>
-
-           {% for target in linkedTargets %}
-        <tr>
-            <td><a href="{{ url_for('twittertargetDetail', id=target.row_id) }}">{{ target.title}}</a></td>
-            <td>{{ target.targetType}}</td>
-            <td><div class="form-group pull-right">                        <form method="post" onclick="return confirm('Are you sure you wan't to remove this target from collection?');"action="{{ url_for('removeCollectionAssociation', id=object.row_id, target=target.row_id) }}">
-  <button class="btn btn-danger btn-xs pull-left"type="submit">Remove</i></button></form></div></td>
-        </tr>
-    {% endfor %}
-           </tbody>
-</table>
-                            </div>
-<!-- ----------------------------------- -->
-
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-               <div class="col-lg-12">
-
-                    <div class="panel panel-default">
-
-                        <div class="panel-heading">
-
-
-
-                            <h3 class="panel-title pull-left"><a data-toggle="collapse" href="#collapse1"><i class="fa fa-search fa-fw"></i> ADD AVAILABLE TARGETS</a></h3>
-
-													<button class="btn btn-primary pull-right" data-toggle="modal" data-target="#targetModal">New User</button>
-                                                    <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#searchApiModal">New Search</button>
-
-
-                            <div class="clearfix"></div>
-
-                        </div>
-
-                        <!-- /.panel-heading -->
-
-                        <div class="panel-body">
-                            <div id="collapse1" class="panel-collapse collapse in">
-                            <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered table-hover" id="assocTable">
-
-        <thead>
-            <tr>
-               <th>Title</th>
-               <th>Target Type</th>
-                <th>Actions</th>
-
-            </tr>
-        </thead>
-        <tbody>
-
-           {% for target in targets %}
-        <tr>
-            <td><a href="{{ url_for('twittertargetDetail', id=target.row_id) }}">{{ target.title}}</a></td>
-            <td>{{ target.targetType}}</td>
-            <td><div class="form-group pull-right">                        <form method="post" onclick="return confirm('Are you sure you wan't to add this target to collection');"action="{{ url_for('addCollectionAssociation', id=object.row_id, target=target.row_id) }}">
-  <button class="btn btn-success btn-xs pull-left"type="submit">Add</i></button></form></div></td>
-        </tr>
-    {% endfor %}
-           </tbody>
-</table>
-                            </div>
-                        </div>
-                    </div>
-                        </div>
-
-
 <script>
 $(document).ready(function() {
     $('#dataTables-example').DataTable( {
@@ -408,11 +71,251 @@ $(document).ready(function() {
 } );
  </script>
  <script>$('.collapse').collapse()</script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-archive fa-fw"></i> Collection Description
+                <div class="form-group pull-right">
+                    <form method="post" onclick="return confirm('Are you sure you wan't to delete this collection?');"action="{{ url_for('removeCollection', id=object.row_id) }}">
+                        <button class="btn btn-danger btn-xs pull-left"type="submit">Delete</i></button></form>
+                </div>
+                <div class="form-group pull-right">
+                    <form method="post" onclick="return confirm('Are you sure you want to start archiving?');"action="{{ url_for('startCollectionCrawl', id=object.row_id) }}">
+                        <button class="btn btn-success btn-xs pull-right"type="submit">Archive now!</i></button></form>
+                </div>
+            </div>
+            <div class="panel-body">
+                <h5><span class="label label-default">Description</span></h5>
+                <ul class="list-unstyled">
+                    <li><b style="color:grey"> Title:</b> {{ object.title }}</li>
+                    <li><b style="color:grey"> Curator:</b> {{ object.curator }}</li>
+                    <li><b style="color:grey">Collection Type:</b> {{ object.collectionType }}</li>
+                    <li><b style="color:grey"> Description:</b> {{ object.description }}</li>
+                    <li><b style="color:grey"> Keywords:</b> {{ object.subject }}</li>
+                    <li><b style="color:grey">Status</b> {{ object.status }}</li>
+                </ul>
+                <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#myModal">Edit</button>
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-pencil" aria-hidden="true"></i>EDIT</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form action="" method="post" name="auth_name">
+                                    {{ collectionForm.hidden_tag() }}
+                                    <div class="form-group">
+                                            <label for="title"data-toggle="popover" title="Title" data-placement="left" data-content="TBD">Title</label>
+                                            {{collectionForm.title(class="form-control",id="title")}}
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tagcreator" data-toggle="popover" title="Creator" data-placement="left" data-content="TBD">Collection Type</label>
+                                        {{collectionForm.collectionType (class="form-control", id="collectionType")}}
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tagcreator" data-toggle="popover" title="tagcreator" data-placement="left" data-content="TBD">Curator</label>
+                                        {{collectionForm.curator(class="form-control", id="tagcrator")}}
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="description" data-toggle="popover" title="Description" data-placement="left" data-content="TBD">Description</label>
+                                        {{collectionForm.description(class="form-control", id="description")}}
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="subject" data-toggle="popover" title="Subject" data-placement="left" data-content="TBD">Keywords</label>
+                                        {{collectionForm.subject(class="form-control", id="subject")}}
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="status" data-toggle="popover" title="Status" data-placement="left" data-content="TBD">Status</label>
+                                        {{collectionForm.status(class="form-control", id="status")}}
+                                    </div>
+                                </form>
+                            </div>
+                             <div class="modal-footer">
+                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                 <input class="btn btn-default" type="submit" value="Spara">
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+ <div class="row">
+     <h5><div class="modal fade" id="targetModal" tabindex="-1" role="dialog" aria-labelledby="targetModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+             <div class="modal-content">
+                 <div class="modal-header">
+                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                     <h4 class="modal-title" id="targetModalLabel"><i class="fa fa-plus" aria-hidden="true"></i> TWITTER USER</h4>
+                 </div>
+                 <div class="modal-body">
+                     <form action="" method="post" name="auth_name">
+                         {{ targetForm.hidden_tag() }}
+                         <div class="form-group">
+                             <label for="title"data-toggle="popover" title="Title" data-placement="left" data-content="TBD">Username</label>
+                             {{targetForm.title(class="form-control",id="title")}}
+                         </div>
 
+                         <div class="form-group">
+                             <label for="tagcreator" data-toggle="popover" title="Creator" data-placement="left" data-content="TBD">Creator</label>
+                             {{targetForm.creator(class="form-control", id="tagcreator")}}
+                         </div>
+                         <div class="form-group">
+                             <label for="description" data-toggle="popover" title="Description" data-placement="left" data-content="TBD">Description</label>
+                             {{targetForm.description(class="form-control", id="description")}}
+                         </div>
+                         <div class="form-group">
+                             <label for="subject" data-toggle="popover" title="Subject" data-placement="left" data-content="TBD">Keywords</label>
+                             {{targetForm.subject(class="form-control", id="contributor")}}
+                         </div>
+                         <div class="form-group">
+                             <label for="status" data-toggle="popover" title="tagettype" data-placement="left" data-content="TBD">Status</label>
+                             {{targetForm.status(class="form-control", id="status")}}
+                         </div>
+                         <div class="form-group pull-left">
+                             <label for="index" data-toggle="popover" title="tagettype" data-placement="left" data-content="TBD">Index</label>
+                             {{targetForm.index(class="form-control", id="index")}}
+                         </div>
+                         <hr>
+                     </form>
+                 </div>
+                 <div class="modal-footer">
+                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                     <input class="btn btn-default" type="submit" value="Save">
+                 </div>
+             </div>
+         </div>
+     </div></h5>
+     <!-- Modal -->
+     <h5><div class="modal fade" id="searchApiModal" tabindex="-1" role="dialog" aria-labelledby="searchApiModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+             <div class="modal-content">
+                 <div class="modal-header">
+                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                     <h4 class="modal-title" id="searchApiModalLabel"><i class="fa fa-plus" aria-hidden="true"></i> TWITTER API-SEARCH</h4>
+                 </div>
+                 <div class="modal-body">
+                     <form action="" method="post" name="auth_name">
+                         {{ searchApiForm.hidden_tag() }}
+                         <div class="form-group">
+                             <label for="title"data-toggle="popover" title="Title" data-placement="left" data-content="TBD">Title</label>{{searchApiForm.title(class="form-control",id="title")}}
+                         </div>
+                         <div class="form-group">
+                             <label for="searchString" data-toggle="popover" title="searchString" data-placement="left" data-content="TBD">Search String</label>
+                             {{searchApiForm.searchString(class="form-control", id="searchString")}}
+                         </div>
+                         <div class="form-group">
+                             <label for="tagcreator" data-toggle="popover" title="Creator" data-placement="left" data-content="TBD">Creator</label>
+                             {{searchApiForm.creator(class="form-control", id="tagcreator")}}
+                         </div>
+                         <div class="form-group">
+                             <label for="description" data-toggle="popover" title="Description" data-placement="left" data-content="TBD">Description</label>
+                             {{searchApiForm.description(class="form-control", id="description")}}
+                         </div>
+                         <div class="form-group">
+                             <label for="subject" data-toggle="popover" title="Subject" data-placement="left" data-content="TBD">Keywords</label>
+                             {{searchApiForm.subject(class="form-control", id="contributor")}}
+                         </div>
+                         <div class="form-group">
+                             <label for="status" data-toggle="popover" title="tagettype" data-placement="left" data-content="TBD">Status</label>
+                             {{searchApiForm.status(class="form-control", id="status")}}
+                         </div>
+                         <div class="form-group pull-left">
+                             <label for="index" data-toggle="popover" title="tagettype" data-placement="left" data-content="TBD">Index</label>
+                             {{searchApiForm.index(class="form-control", id="index")}}
+                         </div>
+                         <hr>
+                     </form>
+                 </div>
+                 <div class="modal-footer">
+                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                     <input class="btn btn-default" type="submit" value="Save">
+                 </div>
+             </div>
+         </div>
+     </div></h5>
+  <!-- -------------------------------------- -->
+     <div class="col-lg-12">
+         <div class="panel panel-default">
+             <div class="panel-heading">
+                 <h3 class="panel-title pull-left"><a data-toggle="collapse" href="#collapse2"><i class="fa fa-crosshairs fa-fw"></i>ASSOCIATED TARGETS</a></h3>
+                 <div class="clearfix"></div>
+             </div>
+             <div class="panel-body">
+                 <div id="collapse2" class="panel-collapse collapse in">
+                     <div class="dataTable_wrapper">
+                         <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                             <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Target Type</th>
+                                    <th>Actions</th>
+                                </tr>
+                             </thead>
+                             <tbody>
+                             {% for target in linkedTargets %}
+                             <tr>
+                                 <td><a href="{{ url_for('twittertargetDetail', id=target.row_id) }}">{{ target.title}}</a></td>
+                                 <td>{{ target.targetType}}</td>
+                                 <td>
+                                     <div class="form-group pull-right">
+                                     <form method="post" onclick="return confirm('Are you sure you wan't to remove this target from collection?');"action="{{ url_for('removeCollectionAssociation', id=object.row_id, target=target.row_id) }}">
+                                         <button class="btn btn-danger btn-xs pull-left"type="submit">Remove</i></button></form></div></td>
+                             </tr>
+                             {% endfor %}
+                             </tbody>
+                         </table>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
 
-
-
-
-
+     <div class="col-lg-12">
+         <div class="panel panel-default">
+             <div class="panel-heading">
+                 <h3 class="panel-title pull-left"><a data-toggle="collapse" href="#collapse1"><i class="fa fa-search fa-fw"></i> ADD AVAILABLE TARGETS</a></h3>
+                 <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#targetModal">New User</button>
+                 <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#searchApiModal">New Search</button>
+                 <div class="clearfix"></div>
+             </div>
+             <div class="panel-body">
+                 <div id="collapse1" class="panel-collapse collapse in">
+                     <div class="dataTable_wrapper">
+                         <table class="table table-striped table-bordered table-hover" id="assocTable">
+                             <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Target Type</th>
+                                    <th>Actions</th>
+                                </tr>
+                             </thead>
+                             <tbody>
+                             {% for target in targets %}
+                                <tr>
+                                    <td><a href="{{ url_for('twittertargetDetail', id=target.row_id) }}">{{ target.title}}</a></td>
+                                    <td>{{ target.targetType}}</td>
+                                    <td>
+                                        <div class="form-group pull-right">
+                                            <form method="post" onclick="return confirm('Are you sure you wan't to add this target to collection');"action="{{ url_for('addCollectionAssociation', id=object.row_id, target=target.row_id) }}">
+                                                <button class="btn btn-success btn-xs pull-left"type="submit">Add</i></button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                             {% endfor %}
+                             </tbody>
+                         </table>
+                     </div>
+                 </div>
+             </div>
+         </div>
+    </div>
+ </div>
 {% endblock %}
