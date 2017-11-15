@@ -133,12 +133,13 @@ $(document).ready(function() {
                                         <label for="status" data-toggle="popover" title="Status" data-placement="left" data-content="TBD">Status</label>
                                         {{collectionForm.status(class="form-control", id="status")}}
                                     </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                        <input class="btn btn-default" type="submit" value="Spara">
+                                    </div>
                                 </form>
                             </div>
-                             <div class="modal-footer">
-                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                 <input class="btn btn-default" type="submit" value="Spara">
-                             </div>
                         </div>
                     </div>
                 </div>
@@ -183,11 +184,11 @@ $(document).ready(function() {
                              {{targetForm.index(class="form-control", id="index")}}
                          </div>
                          <hr>
+                         <div class="modal-footer">
+                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                             <input class="btn btn-default" type="submit" value="Save">
+                         </div>
                      </form>
-                 </div>
-                 <div class="modal-footer">
-                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                     <input class="btn btn-default" type="submit" value="Save">
                  </div>
              </div>
          </div>
@@ -231,11 +232,11 @@ $(document).ready(function() {
                              {{searchApiForm.index(class="form-control", id="index")}}
                          </div>
                          <hr>
+                         <div class="modal-footer">
+                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                             <input class="btn btn-default" type="submit" value="Save">
+                         </div>
                      </form>
-                 </div>
-                 <div class="modal-footer">
-                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                     <input class="btn btn-default" type="submit" value="Save">
                  </div>
              </div>
          </div>
@@ -281,8 +282,18 @@ $(document).ready(function() {
          <div class="panel panel-default">
              <div class="panel-heading">
                  <h3 class="panel-title pull-left"><a data-toggle="collapse" href="#collapse1"><i class="fa fa-search fa-fw"></i> ADD AVAILABLE TARGETS</a></h3>
+                 <!--
                  <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#targetModal">New User</button>
                  <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#searchApiModal">New Search</button>
+                 -->
+                 <div class="btn-group pull-right">
+                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add New <span class="caret"></span></button>
+                     <ul class="dropdown-menu">
+                         <li><a href="#targetModal" data-toggle="modal">User Timeline</a></li>
+                         <li><a href="#searchApiModal" data-toggle="modal">API-Search</a></li>
+                     </ul>
+                 </div>
+
                  <div class="clearfix"></div>
              </div>
              <div class="panel-body">
