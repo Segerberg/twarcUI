@@ -3,82 +3,26 @@
 <i class="fa fa-archive fa-fw"></i> {{ object.title }}
 {% endblock %}
 {% block head %}
-<script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.11/js/dataTables.bootstrap.min.js"></script>
-<link href="https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.min.css" media="all" rel="stylesheet" type="text/css" />
-<script>
- $(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
-</script>
-<script>
-$(function () {
-  $('[data-toggle="popover"]').popover()
-})
-</script>
-<script>
-$(document).ready(function() {
-    $('#dataTables-example').DataTable( {
-        stateSave: false,
-        aLengthMenu: [
-        [10,25, 50, 100, -1],
-        [10,25, 50, 100, "All"]],
-        responsive: true,
-        "language": {
-            "lengthMenu": "Show _MENU_ ",
-            "zeroRecords": "found nothing...",
-            "info": "showing _PAGE_ of _PAGES_",
-            "infoEmpty": "No records to show",
-            "infoFiltered": "(filtred from total _MAX_ records)",
-             "paginate": {
-             "first":      "First",
-             "last":       "Last",
-             "next":       "Next",
-             "previous":   "Previous"
 
-    },
-        "search": "Search",
-        }
-
-    } );
-} );
- </script>
- <script>
-$(document).ready(function() {
-    $('#assocTable').DataTable( {
-        stateSave: false,
-        aLengthMenu: [
-        [10,25, 50, 100, -1],
-        [10,25, 50, 100, "All"]],
-        responsive: true,
-        "language": {
-            "lengthMenu": "Show _MENU_ ",
-            "zeroRecords": "found nothing...",
-            "info": "showing _PAGE_ of _PAGES_",
-            "infoEmpty": "No records to show",
-            "infoFiltered": "(filtred from total _MAX_ records)",
-             "paginate": {
-             "first":      "First",
-             "last":       "Last",
-             "next":       "Next",
-             "previous":   "Previous"
-
-    },
-        "search": "Search",
-        }
-
-    } );
-} );
- </script>
- <script>$('.collapse').collapse()</script>
 {% endblock %}
 
 {% block content %}
+<script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.11/js/dataTables.bootstrap.min.js"></script>
+<link href="https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.min.css" media="all" rel="stylesheet" type="text/css" />
 <div class="row">
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <i class="fa fa-archive fa-fw"></i> Collection Description
+                <div class="btn-group pull-right">
+                     <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></button>
+                     <ul class="dropdown-menu">
+                         <li><form method="post" onclick="return confirm('Are you sure you want to start archiving?');"action="{{ url_for('startCollectionCrawl', id=object.row_id) }}"><button class="btn btn-success btn-xs pull-right"type="submit">Archive now!</i></button></form></li>
+                         <li><form method="post" onclick="return confirm('Are you sure you wan't to delete this collection?');"action="{{ url_for('removeCollection', id=object.row_id) }}"><button class="btn btn-danger btn-xs"type="submit">Delete</i></button></form></li>
+                     </ul>
+                 </div>
+                <!--
                 <div class="form-group pull-right">
                     <form method="post" onclick="return confirm('Are you sure you wan't to delete this collection?');"action="{{ url_for('removeCollection', id=object.row_id) }}">
                         <button class="btn btn-danger btn-xs pull-left"type="submit">Delete</i></button></form>
@@ -87,6 +31,7 @@ $(document).ready(function() {
                     <form method="post" onclick="return confirm('Are you sure you want to start archiving?');"action="{{ url_for('startCollectionCrawl', id=object.row_id) }}">
                         <button class="btn btn-success btn-xs pull-right"type="submit">Archive now!</i></button></form>
                 </div>
+                -->
             </div>
             <div class="panel-body">
                 <h5><span class="label label-default">Description</span></h5>
@@ -277,17 +222,12 @@ $(document).ready(function() {
              </div>
          </div>
      </div>
-
      <div class="col-lg-12">
          <div class="panel panel-default">
              <div class="panel-heading">
                  <h3 class="panel-title pull-left"><a data-toggle="collapse" href="#collapse1"><i class="fa fa-search fa-fw"></i> ADD AVAILABLE TARGETS</a></h3>
-                 <!--
-                 <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#targetModal">New User</button>
-                 <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#searchApiModal">New Search</button>
-                 -->
                  <div class="btn-group pull-right">
-                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add New <span class="caret"></span></button>
+                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add New <span class="caret"></span></button>
                      <ul class="dropdown-menu">
                          <li><a href="#targetModal" data-toggle="modal">User Timeline</a></li>
                          <li><a href="#searchApiModal" data-toggle="modal">API-Search</a></li>
@@ -329,4 +269,70 @@ $(document).ready(function() {
          </div>
     </div>
  </div>
+
+<script>
+ $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+<script>
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})
+</script>
+<script>
+$(document).ready(function() {
+    $('#dataTables-example').DataTable( {
+        stateSave: false,
+        aLengthMenu: [
+        [10,25, 50, 100, -1],
+        [10,25, 50, 100, "All"]],
+        responsive: true,
+        "language": {
+            "lengthMenu": "Show _MENU_ ",
+            "zeroRecords": "found nothing...",
+            "info": "showing _PAGE_ of _PAGES_",
+            "infoEmpty": "No records to show",
+            "infoFiltered": "(filtred from total _MAX_ records)",
+             "paginate": {
+             "first":      "First",
+             "last":       "Last",
+             "next":       "Next",
+             "previous":   "Previous"
+
+    },
+        "search": "Search",
+        }
+
+    } );
+} );
+ </script>
+ <script>
+$(document).ready(function() {
+    $('#assocTable').DataTable( {
+        stateSave: false,
+        aLengthMenu: [
+        [10,25, 50, 100, -1],
+        [10,25, 50, 100, "All"]],
+        responsive: true,
+        "language": {
+            "lengthMenu": "Show _MENU_ ",
+            "zeroRecords": "found nothing...",
+            "info": "showing _PAGE_ of _PAGES_",
+            "infoEmpty": "No records to show",
+            "infoFiltered": "(filtred from total _MAX_ records)",
+             "paginate": {
+             "first":      "First",
+             "last":       "Last",
+             "next":       "Next",
+             "previous":   "Previous"
+
+    },
+        "search": "Search",
+        }
+
+    } );
+} );
+ </script>
+ <script>$('.collapse').collapse()</script>
 {% endblock %}

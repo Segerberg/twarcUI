@@ -1,34 +1,5 @@
 {% extends "base.html" %}
 {% block head %}
-<script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.11/js/dataTables.bootstrap.min.js"></script>
-<link href="https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.min.css" media="all" rel="stylesheet" type="text/css" />
-<script>
-$(document).ready(function() {
-    $('#dataTables-example').DataTable( {
-        stateSave: true,
-        aLengthMenu: [
-        [10,25, 50, 100, -1],
-        [10,25, 50, 100, "All"]],
-        responsive: true,
-        "language": {
-            "lengthMenu": "Show _MENU_ ",
-            "zeroRecords": "found nothing...",
-            "info": "showing _PAGE_ of _PAGES_",
-            "infoEmpty": "No records to show",
-            "infoFiltered": "(filtred from total _MAX_ records)",
-             "paginate": {
-             "first":      "First",
-             "last":       "Last",
-             "next":       "Next",
-             "previous":   "Previous"
-    },
-        "search": "Search",
-        }
-    } );
-} );
- </script>
-
 {% endblock %}
 
 {% block pageHeader %}
@@ -128,4 +99,29 @@ $(document).ready(function() {
         </div>
     </div>
 </div>
+<script>
+$(document).ready(function() {
+    $('#dataTables-example').DataTable( {
+        stateSave: true,
+        aLengthMenu: [
+        [10,25, 50, 100, -1],
+        [10,25, 50, 100, "All"]],
+        responsive: true,
+        "language": {
+            "lengthMenu": "Show _MENU_ ",
+            "zeroRecords": "found nothing...",
+            "info": "showing _PAGE_ of _PAGES_",
+            "infoEmpty": "No records to show",
+            "infoFiltered": "(filtred from total _MAX_ records)",
+             "paginate": {
+             "first":      "First",
+             "last":       "Last",
+             "next":       "Next",
+             "previous":   "Previous"
+    },
+        "search": "Search",
+        }
+    } );
+} );
+ </script>
 {% endblock %}
