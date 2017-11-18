@@ -18,8 +18,10 @@
                 <div class="btn-group pull-right">
                      <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></button>
                      <ul class="dropdown-menu">
-                         <li><form method="post" onclick="return confirm('Are you sure you want to start archiving?');"action="{{ url_for('startCollectionCrawl', id=object.row_id) }}"><button class="btn btn-success btn-xs pull-right"type="submit">Archive now!</i></button></form></li>
-                         <li><form method="post" onclick="return confirm('Are you sure you wan't to delete this collection?');"action="{{ url_for('removeCollection', id=object.row_id) }}"><button class="btn btn-danger btn-xs"type="submit">Delete</i></button></form></li>
+                         <div class="btn-group-vertical btn-group-justified">
+                         <form class="btn-group" method="post" onclick="return confirm('Are you sure you want to start archiving?');"action="{{ url_for('startCollectionCrawl', id=object.row_id) }}"><button class="btn btn-primary btn-xs pull-right"type="submit">Archive now!</i></button></form>
+                         <form class="btn-group" method="post" onclick="return confirm('Are you sure you wan't to delete this collection?');"action="{{ url_for('removeCollection', id=object.row_id) }}"><button class="btn btn-danger btn-xs"type="submit">Delete</i></button></form>
+                        </div>
                      </ul>
                  </div>
                 <!--
@@ -43,13 +45,13 @@
                     <li><b style="color:grey"> Keywords:</b> {{ object.subject }}</li>
                     <li><b style="color:grey">Status</b> {{ object.status }}</li>
                 </ul>
-                <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#myModal">Edit</button>
+                <button class="btn btn-primary pull-right btn-xs" data-toggle="modal" data-target="#myModal">Edit</button>
                 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-pencil" aria-hidden="true"></i>EDIT</h4>
+                                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-pencil" aria-hidden="true"></i>Edit</h4>
                             </div>
                             <div class="modal-body">
                                 <form action="" method="post" name="auth_name">
@@ -186,11 +188,13 @@
              </div>
          </div>
      </div></h5>
+ </div>
   <!-- -------------------------------------- -->
+  <div class="row">
      <div class="col-lg-12">
          <div class="panel panel-default">
              <div class="panel-heading">
-                 <h3 class="panel-title pull-left"><a data-toggle="collapse" href="#collapse2"><i class="fa fa-crosshairs fa-fw"></i>ASSOCIATED TARGETS</a></h3>
+                 <div class="panel-title pull-left"><a data-toggle="collapse" href="#collapse2"><i class="fa fa-crosshairs fa-fw"></i>Associated Targets</a></div>
                  <div class="clearfix"></div>
              </div>
              <div class="panel-body">
@@ -222,12 +226,14 @@
              </div>
          </div>
      </div>
+  </div>
+<div class="row">
      <div class="col-lg-12">
          <div class="panel panel-default">
              <div class="panel-heading">
-                 <h3 class="panel-title pull-left"><a data-toggle="collapse" href="#collapse1"><i class="fa fa-search fa-fw"></i> ADD AVAILABLE TARGETS</a></h3>
+                 <div class="panel-title pull-left"><a data-toggle="collapse" href="#collapse1"><i class="fa fa-search fa-fw"></i> Add Available Targets</a></div>
                  <div class="btn-group pull-right">
-                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add New <span class="caret"></span></button>
+                     <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add New <span class="caret"></span></button>
                      <ul class="dropdown-menu">
                          <li><a href="#targetModal" data-toggle="modal">User Timeline</a></li>
                          <li><a href="#searchApiModal" data-toggle="modal">API-Search</a></li>
@@ -268,6 +274,7 @@
              </div>
          </div>
     </div>
+</div>
  </div>
 
 <script>

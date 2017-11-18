@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 {% block pageHeader %}
-
+{% if twitterTarget.targetType == "Search" %}
+<a href="{{ url_for('twittertargetDetail',  id=twitterTarget.row_id) }}">{{twitterTarget.title}}</a>
+{% else %}
 <a href="{{ url_for('twittertargetDetail',  id=twitterTarget.row_id) }}">@{{id}}</a> {% if not twitterTarget %}<button class="btn btn-default pull-right" data-toggle="modal" data-target="#myModal">Add</button>{% endif %}
- <!-- Modal -->
+{% endif %}
+<!-- Modal -->
 <h5>
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -68,6 +71,7 @@
 <!-- /Modal -->
 
 
+
 {% if not twitterTarget %}
 <br>
 <div class="alert alert-info  alert-dismissable">
@@ -79,7 +83,7 @@
 {% if results %}
 {% for result in results.items %}
 <article class="tweet">
-    <a href="https://www.twitter.com/{{result.username}}" class="name">{{result.screen_name}}</a><br>
+    <a href="{{ url_for('userlist',page=1, id=result.username)}}" class="name">{{result.screen_name}}</a><br>
     <span class="username">@{{result.username}}</span><br>
     <br>
     <span class="twitter">{{result.text}}</span><br>
@@ -89,7 +93,14 @@
     </footer>
 </article>
 {% endfor %}
-
+{% if twitterTarget.targetType == "Search" %}
+<ul class = "pagination">
+{% if results.has_prev %}<li><a href="{{ url_for('searchlist', page=results.prev_num, id=id) }}">&laquo;</a></li>{% else %}{% endif %}
+{% for page in results.iter_pages() %}{% if page == None %} {% else %}  <li><a href="{{ url_for('searchlist', page=page, id=id) }}">{{page}}</a></li>{% endif %}{% endfor %}
+{% if results.has_next %}<li><a href="{{ url_for('searchlist', page=results.next_num, id=id) }}">&raquo;</a></li>{% else %}{% endif %}
+</ul>
+{% endif %}
+{% else %}
 <ul class = "pagination">
 {% if results.has_prev %}<li><a href="{{ url_for('userlist', page=results.prev_num, id=id) }}">&laquo;</a></li>{% else %}{% endif %}
 {% for page in results.iter_pages() %}{% if page == None %} {% else %}  <li><a href="{{ url_for('userlist', page=page, id=id) }}">{{page}}</a></li>{% endif %}{% endfor %}
@@ -142,7 +153,7 @@ article.tweet {
 	$.fn.tweetify = function() {
 		this.each(function() {
 			$(this).html(
-			$(this).html().replace(/((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/gi, '<a href="$1">$1</a>').replace(/(^|\s)#([a-z0-9åäöA-ZÅÄÖ_]+)/g, '$1<a href="http://search.twitter.com/search?q=%23$2">#$2</a>').replace(/(^|\s)@(\w+)/g, '$1<a href="/usertweets/$2/1">@$2</a>'));
+			$(this).html().replace(/((ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?)/gi, '<a href="$1">$1</a>').replace(/(^|\s)#([a-z0-9åäöA-ZÅÄÖ_]+)/g, '$1<a href="https://twitter.com/hashtag/$2">#$2</a>').replace(/(^|\s)@(\w+)/g, '$1<a href="/usertweets/$2/1">@$2</a>'));
 		});
 		return $(this);
 	}

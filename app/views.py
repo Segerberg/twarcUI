@@ -6,11 +6,10 @@ from .forms import twitterTargetForm, SearchForm, twitterCollectionForm, collect
 from sqlalchemy.exc import IntegrityError
 from .twarcUIarchive import twittercrawl
 from config import POSTS_PER_PAGE, REDIS_DB
-import os
 from datetime import datetime
 from redislite import Redis
 from rq import Queue
-import json
+
 
 q = Queue(connection=Redis(REDIS_DB))
 
@@ -143,6 +142,7 @@ def collections():
 @app.route('/usertweets/<id>/<int:page>', methods=['GET', 'POST'])
 def userlist(id,page=1):
     id=id
+    print (id)
     results = models.SEARCH.query.filter(models.SEARCH.username==id).order_by(models.SEARCH.created_at.desc()).paginate(page, POSTS_PER_PAGE, False)
     twitterTarget = models.TWITTER.query.filter(models.TWITTER.title == id).first()
     form = twitterTargetForm(prefix='form')
@@ -168,7 +168,33 @@ def userlist(id,page=1):
 
     return render_template("usertweets.html", results=results,id=id, twitterTarget=twitterTarget,form=form)
 
+'''Route to view archived user tweets '''
+@app.route('/searchtweets/<id>/<int:page>', methods=['GET', 'POST'])
+def searchlist(id,page=1):
+    id=id
+    results = models.SEARCH.query.filter(models.SEARCH.source==id).order_by(models.SEARCH.created_at.desc()).paginate(page, POSTS_PER_PAGE, False)
+    twitterTarget = models.TWITTER.query.filter(models.TWITTER.row_id == id).first()
+    form = twitterTargetForm(prefix='form')
+    if request.method == 'POST' and form.validate_on_submit():
+        try:
+            addTarget = models.TWITTER(title=form.title.data,searchString='' ,creator=form.creator.data, targetType='User',
+                                       description=form.description.data, subject=form.subject.data,
+                                       status=form.status.data, lastCrawl=None, totalTweets=0,
+                                       added=datetime.now(), woeid=None, index=form.index.data, oldTweets=None)
+            addLog = models.CRAWLLOG(tag_title=form.title.data, event_start=datetime.now(), event_text='ADDED TO DB')
+            addTarget.logs.append(addLog)
+            db.session.add(addTarget)
+            db.session.commit()
+            db.session.close()
 
+        except IntegrityError:
+            flash(u'Twitter user account already in database ', 'danger')
+            db.session.rollback()
+        return redirect(url_for('twittertargets'))
+
+
+
+    return render_template("usertweets.html", results=results,id=id, twitterTarget=twitterTarget,form=form)
 
 '''Route to detail view of twitter user/search target'''
 @app.route('/twittertargets/<id>', methods=['GET', 'POST'])
@@ -313,7 +339,7 @@ def removeTwitterTarget(id):
 '''
 Route to remove collection
 '''
-@app.route('/removecollection/<id>', methods=['POST'])
+@app.route('/removecollection/<id>', methods=['GET','POST'])
 def removeCollection(id):
     object = models.COLLECTION.query.get_or_404(id)
     db.session.delete(object)
