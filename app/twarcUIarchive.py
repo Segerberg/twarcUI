@@ -34,19 +34,6 @@ def twittercrawl(id):
             format="%(asctime)s %(levelname)s %(message)s"
         )
 
-        lockfile = os.path.join(ARCHIVE_BASEDIR, '') + "lockfile"
-        if not os.path.exists(lockfile):
-            pid = os.getpid()
-            lockfile_handle = open(lockfile, "w")
-            lockfile_handle.write(str(pid))
-            lockfile_handle.close()
-        else:
-            old_pid = "unknown"
-            with open(lockfile, "r") as lockfile_handle:
-                old_pid = lockfile_handle.read()
-
-            sys.exit("Another twarc-archive.py process with pid " + old_pid + " is running. If the process is no longer active then it may have been interrupted. In that case remove the 'lockfile' in " + args.archive_dir + " and run the command again.")
-
         logging.info("logging search for %s to %s", TWITTER.title, os.path.join(ARCHIVE_BASEDIR,TWITTER.title))
 
         t = twarc.Twarc(consumer_key=CONSUMER_KEY,
@@ -118,8 +105,7 @@ def twittercrawl(id):
             db.session.commit()
 
 
-        if os.path.exists(lockfile):
-            os.remove(lockfile)
+
 
 def get_last_archive(archive_dir):
     count = 0
