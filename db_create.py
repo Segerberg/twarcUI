@@ -5,9 +5,14 @@ from config import SQLALCHEMY_MIGRATE_REPO
 
 from app import db
 from migrate.versioning import api
-db.create_all()
-if not os.path.exists(SQLALCHEMY_MIGRATE_REPO):
-    api.create(SQLALCHEMY_MIGRATE_REPO, 'database repository')
-    api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
-else:
-    api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO, api.version(SQLALCHEMY_MIGRATE_REPO))
+from migrate.exceptions import *
+
+try:
+    db.create_all()
+    if not os.path.exists(SQLALCHEMY_MIGRATE_REPO):
+        api.create(SQLALCHEMY_MIGRATE_REPO, 'database repository')
+        api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
+    else:
+        api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO, api.version(SQLALCHEMY_MIGRATE_REPO))
+except DatabaseAlreadyControlledError:
+    print("Database %s already has version control" % SQLALCHEMY_DATABASE_URI)
