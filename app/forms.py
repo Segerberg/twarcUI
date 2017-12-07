@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from app import models, db
 from wtforms import StringField, BooleanField, SelectField, DateField, FieldList, FormField, TextAreaField, SelectMultipleField, widgets
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired,Regexp
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 
@@ -10,9 +10,6 @@ def collectionTypes():
 
 class collectionAddForm(FlaskForm):
     assoc = QuerySelectField(u'Collection Name', query_factory=collectionTypes, get_label='title')
-
-
-
 
 
 class twitterTargetForm(FlaskForm):
@@ -37,3 +34,9 @@ class twitterCollectionForm(FlaskForm):
 
 class SearchForm(FlaskForm):
     search = StringField('search', validators=[DataRequired()])
+
+class twitterTrendForm(FlaskForm):
+    geoloc = StringField(u'geo location', validators=[DataRequired(),Regexp(message='Not a valid geolocation, sorry.',regex="^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$")])
+
+
+

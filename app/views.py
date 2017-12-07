@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from app import app, render_template, request,db, url_for, redirect,flash,Response
+from app import app, render_template, request,db, url_for, redirect,flash,Response,jsonify
 from app import models
-from .forms import twitterTargetForm, SearchForm, twitterCollectionForm, collectionAddForm
+from .forms import twitterTargetForm, SearchForm, twitterCollectionForm, collectionAddForm, twitterTrendForm
 from sqlalchemy.exc import IntegrityError
 from .twarcUIarchive import twittercrawl
+from .twitterTrends import getTrends
 from config import POSTS_PER_PAGE, REDIS_DB
-from datetime import datetime
+from datetime import datetime, timedelta
 from redislite import Redis
 from rq import Queue
+from rq.worker import Worker
 
 
 q = Queue(connection=Redis(REDIS_DB))
@@ -23,15 +25,17 @@ def before_request():
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+    workers = Worker.all(connection=Redis(REDIS_DB))
     twitterUserCount = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType=='User').count()
     twitterSearchCount = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType == 'Search').count()
     collectionCount = models.COLLECTION.query.filter(models.COLLECTION.status=='1').count()
+    trendsCount = db.session.query(models.TRENDS_LOC).count()
     CRAWLLOG = models.CRAWLLOG.query.order_by(models.CRAWLLOG.row_id.desc()).limit(10).all()
     form = SearchForm()
     if request.method == 'POST':
         return redirect((url_for('search_results', form=form, query=form.search.data)))
 
-    return render_template("index.html", twitterUserCount=twitterUserCount, twitterSearchCount=twitterSearchCount, collectionCount=collectionCount, CRAWLLOG=CRAWLLOG, form=form)
+    return render_template("index.html", twitterUserCount=twitterUserCount, twitterSearchCount=twitterSearchCount, collectionCount=collectionCount,trendsCount=trendsCount, CRAWLLOG=CRAWLLOG, workers=workers, form=form)
 
 '''SEARCH'''
 @app.route('/search', methods=['GET', 'POST'])
@@ -80,6 +84,98 @@ def twittertargets():
             db.session.rollback()
 
     return render_template("twittertargets.html", TWITTER=TWITTER, form=form)
+
+
+'''TRENDS'''
+@app.route('/twittertrends', methods=['GET', 'POST'])
+def twittertrends():
+    filterTime = datetime.utcnow() - timedelta(minutes=60)
+    loc = models.TRENDS_LOC.query.all()
+    trend = models.TWITTER_TRENDS.query.filter(models.TWITTER_TRENDS.collected > filterTime).all()
+    trendAll = models.TWITTER_TRENDS.query.order_by(models.TWITTER_TRENDS.collected.desc()).all()
+    #CRAWLLOG = models.CRAWLLOG.query.order_by(models.CRAWLLOG.row_id.desc()).limit(10).all()
+    trendForm = twitterTrendForm(prefix='trendform')
+    form = twitterTargetForm(prefix='form')
+
+    if request.method == 'POST' and trendForm.validate_on_submit():
+        addloc = models.TRENDS_LOC(name=None,loc=trendForm.geoloc.data)
+        db.session.add(addloc)
+        db.session.commit()
+        q.enqueue(getTrends)
+        flash(u'Trend location added!', 'success')
+        return redirect((url_for('twittertrends')))
+    if request.method == 'POST' and not trendForm.validate_on_submit():
+        flash(u'Not a valid location!', 'danger')
+        return redirect((url_for('twittertrends')))
+
+    return render_template("trends.html", loc=loc, trend=trend, trendForm=trendForm, form=form, trendAll=trendAll)
+
+"""Route to add Trend to Search"""
+@app.route('/addtwittertrend/<id>', methods=['GET', 'POST'])
+def addtwittertrend(id):
+    trendAll = models.TWITTER_TRENDS.query.all()
+    twitterTargets = models.TWITTER.query.all()
+    if request.method == 'POST':
+        addTarget = models.TWITTER(title=id, searchString=id,
+                                   creator='', targetType='Search',
+                                   description='', subject='',
+                                   status='1', lastCrawl=None, totalTweets=0,
+                                   added=datetime.now(), woeid=None, index=0, oldTweets=None)
+
+        addLog = models.CRAWLLOG(tag_title=id, event_start=datetime.now(), event_text='Added to database')
+        addLog2 = models.CRAWLLOG(tag_title=id, event_start=datetime.now(), event_text='Manually added from Trend monitoring')
+        for t in trendAll:
+            if t.name == id:
+                t.saved=1
+
+        addTarget.logs.append(addLog)
+        addTarget.logs.append(addLog2)
+        db.session.add(addTarget)
+        db.session.commit()
+        db.session.close()
+        return redirect((url_for('twittertrends')))
+
+
+"""Route to clear Trends"""
+@app.route('/cleartwittertrend/<id>', methods=['GET', 'POST'])
+def cleartwittertrend(id):
+    trendAll = models.TRENDS_LOC.query.filter(models.TRENDS_LOC.row_id==id).all()
+    print (request.url_rule)
+    for t in trendAll:
+        for trend in t.trends:
+            if trend.saved == False:
+                db.session.delete(trend)
+    db.session.commit()
+    return redirect((url_for('twittertrends')))
+
+
+"""Route to delete Trend Location"""
+@app.route('/deletetrendlocation/<id>', methods=['GET', 'POST'])
+def deleteTrendLocation(id):
+    trendLocation = models.TRENDS_LOC.query.filter(models.TRENDS_LOC.row_id==id).first()
+    db.session.delete(trendLocation)
+    db.session.commit()
+    return redirect((url_for('twittertrends')))
+
+"""Route to remove Trend from Search"""
+@app.route('/removetwittertrend/<id>', methods=['GET', 'POST'])
+def removetwittertrend(id):
+    trendAll = models.TWITTER_TRENDS.query.all()
+    if request.method == 'POST':
+        for t in trendAll:
+            if t.name == id:
+                db.session.delete(t)
+        db.session.commit()
+    return redirect((url_for('twittertrends')))
+
+"""Route to refresh trends """
+@app.route('/refreshtwittertrend', methods=['GET', 'POST'])
+def refreshtwittertrend():
+    q.enqueue(getTrends)
+    return redirect((url_for('twittertrends')))
+
+
+
 
 
 '''API-SEARCH-TARGETS'''
@@ -380,6 +476,13 @@ def startTwitterCrawl(id):
             return redirect('/twittersearchtargets')
         else:
             return redirect('/twittertargets')
+
+"""Route to monitor if job is in queue"""
+@app.route('/_qmonitor', methods=['GET', 'POST'])
+def qmonitor():
+    workers = Worker.all(connection=Redis(REDIS_DB))
+
+    return jsonify(qlen=len(q), wlen=len(workers))
 
 '''
 Route to call collection twarc-archive

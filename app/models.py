@@ -70,6 +70,36 @@ class COLLECTION(db.Model):
         self.added = added
         self.totalTweets = totalTweets
 
+class TRENDS_LOC(db.Model):
+    __tablename__ = 'TRENDS_LOC'
+    row_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250))
+    loc =  db.Column(db.String(250))
+    trends = db.relationship("TWITTER_TRENDS", backref='twitter_trends', lazy=True, cascade="save-update, merge, delete")
+
+    def __init__(self,name, loc):
+        self.name = name
+        self.loc = loc
+
+class TWITTER_TRENDS(db.Model):
+    __tablename__ = 'TWITTER_TRENDS'
+    row_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250))
+    promoted_content = db.Column(db.String(250))
+    tweet_volume = db.Column(db.String(250))
+    url = db.Column(db.String(250))
+    collected = db.Column(db.DateTime)
+    saved = db.Column(db.Boolean)
+    trend_loc = db.Column(db.Integer, db.ForeignKey('TRENDS_LOC.row_id'), nullable=False)
+
+
+    def __init__(self,name, promoted_content, tweet_volume,url,collected, saved):
+        self.name = name
+        self.promoted_content = promoted_content
+        self.tweet_volume = tweet_volume
+        self.url = url
+        self.collected = collected
+        self.saved = saved
 
 
 
