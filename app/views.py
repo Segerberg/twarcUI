@@ -6,7 +6,7 @@ from .forms import twitterTargetForm, SearchForm, twitterCollectionForm, collect
 from sqlalchemy.exc import IntegrityError
 from .twarcUIarchive import twittercrawl
 from .twitterTrends import getTrends
-from config import POSTS_PER_PAGE, REDIS_DB
+from config import POSTS_PER_PAGE, REDIS_DB, MAP_VIEW,MAP_ZOOM
 from datetime import datetime, timedelta
 from redislite import Redis
 from rq import Queue
@@ -108,7 +108,7 @@ def twittertrends():
         flash(u'Not a valid location!', 'danger')
         return redirect((url_for('twittertrends')))
 
-    return render_template("trends.html", loc=loc, trend=trend, trendForm=trendForm, form=form, trendAll=trendAll)
+    return render_template("trends.html", loc=loc, trend=trend, trendForm=trendForm, form=form, trendAll=trendAll, MAP_VIEW = MAP_VIEW, MAP_ZOOM=MAP_ZOOM)
 
 """Route to add Trend to Search"""
 @app.route('/addtwittertrend/<id>', methods=['GET', 'POST'])
@@ -502,3 +502,6 @@ def startCollectionCrawl(id):
             q.enqueue(twittercrawl, target.row_id)
         db.session.close()
         return redirect(url_for('collectionDetail', id=id))
+
+
+
