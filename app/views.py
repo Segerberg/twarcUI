@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from .twarcUIarchive import twittercrawl
 from .twitterTrends import getTrends
 from .dehydrate import dehydrateUserSearch,dehydrateCollection
+from .wordcloud import wordCloud, wordCloudCollection
 from config import POSTS_PER_PAGE, REDIS_DB, MAP_VIEW,MAP_ZOOM
 from datetime import datetime, timedelta
 from redislite import Redis
@@ -519,6 +520,25 @@ def dehydrate(id):
     elif '/collectiondetail/' in request.referrer:
         q.enqueue(dehydrateCollection, id)
         flash(u'Dehydrating, please refresh page!', 'success')
+
+    else:
+        flash(u'Ooops something went wrong!', 'danger')
+
+    return redirect(request.referrer)
+
+
+'''
+Route to call wordCloud
+'''
+@app.route('/wordcloud/<id>', methods=['GET','POST'])
+def wordc(id):
+    if '/twittertargets/' in request.referrer:
+        q.enqueue(wordCloud, id)
+        flash(u'Generating wordcloud, please refresh page!', 'success')
+
+    elif '/collectiondetail/' in request.referrer:
+        q.enqueue(wordCloudCollection, id)
+        flash(u'Generating wordcloud, please refresh page!', 'success')
 
     else:
         flash(u'Ooops something went wrong!', 'danger')

@@ -17,8 +17,9 @@
                      <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></button>
                      <ul class="dropdown-menu">
                          <li><a href="{{ url_for('startTwitterCrawl', id=TWITTER.row_id) }}"><i class="fa fa-download fa-fw"></i> Archive</a></li>
-                          <li><a href="{{ url_for('dehydrate', id=TWITTER.row_id) }}"><i class="fa fa-tint fa-fw"></i> Dehydrate</a></li>
-                          <li role="separator" class="divider"></li>
+                         <li><a href="{{ url_for('dehydrate', id=TWITTER.row_id) }}"><i class="fa fa-tint fa-fw"></i> Dehydrate</a></li>
+                         <li><a href="{{ url_for('wordc', id=TWITTER.row_id) }}"><i class="fa fa-cloud fa-fw"></i> Wordcloud</a></li>
+                         <li role="separator" class="divider"></li>
                          <li><a href="{{ url_for('removeTwitterTarget', id=TWITTER.row_id) }}"><i class="fa fa-trash fa-fw"></i> Delete</a></li>
                      </ul>
                  </div>
@@ -163,7 +164,7 @@
                      <tbody>
                      {% for EXPORT in EXPORTS %}
                      <tr>
-                         <td><a href="{{ url_for('export', filename=EXPORT.url)}}"download="export">{{ EXPORT.type}}</a></td>
+                         <td><a href="{{ url_for('export', filename=EXPORT.url)}}" target="_blank">{{ EXPORT.type}}</a></td>
                          {% if EXPORT.exported == None %}
                          <td>N/A</td>
                          {% else %}

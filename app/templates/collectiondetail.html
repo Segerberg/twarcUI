@@ -21,6 +21,7 @@
                      <ul class="dropdown-menu">
                          <li><a href="{{ url_for('startCollectionCrawl', id=object.row_id) }}"><i class="fa fa-download fa-fw"></i> Archive</a></li>
                          <li><a href="{{ url_for('dehydrate', id=object.row_id) }}"><i class="fa fa-tint fa-fw"></i> Dehydrate</a></li>
+                         <li><a href="{{ url_for('wordc', id=object.row_id) }}"><i class="fa fa-cloud fa-fw"></i> Wordcloud</a></li>
                          <li role="separator" class="divider"></li>
                          <li><a href="{{ url_for('removeCollection', id=object.row_id) }}"><i class="fa fa-trash fa-fw"></i> Delete</a></li>
                      </ul>
