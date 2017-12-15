@@ -98,30 +98,20 @@
 </style>
 <script>
 
-    var map = L.map('map', {scrollWheelZoom:false}).setView([58.217, 12.392], 4);
+    var map = L.map('map', {scrollWheelZoom:false}).setView([{{MAP_VIEW}}], {{MAP_ZOOM}});
 
-    //  add base map tiles from OpenStreetMap and attribution info to 'map' div
     L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    // create custom icon
-    var firefoxIcon = L.icon({
-        iconUrl: 'http://joshuafrazier.info/images/firefox.svg',
-        iconSize: [38, 95], // size of the icon
-        popupAnchor: [0,-15]
-        });
 
-    // create popup contents
 
-    // specify popup options
     var customOptions =
         {
         'maxWidth': '500',
         'className' : 'custom'
         }
 
-    // create marker object, pass custom icon as option, pass content and options to popup, add to map
     {%for l in loc %}
     var customPopup = "<strong>{{l.name}}</strong><br>{%for t in trend %}{% if t.trend_loc == l.row_id %}<br>{{t.name}}{%endif%}{%endfor%}";
 
