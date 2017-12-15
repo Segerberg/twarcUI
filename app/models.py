@@ -24,6 +24,7 @@ class TWITTER(db.Model):
     index = db.Column(db.Boolean)
     oldTweets = db.Column(db.Boolean)
     logs = db.relationship("CRAWLLOG", backref='twitter', lazy=True, cascade="save-update, merge, delete")
+    exports = db.relationship("EXPORTS", backref='twitter_us_exports', lazy=True, cascade="save-update, merge, delete")
     tags = db.relationship('COLLECTION', secondary=assoc_twitter_collections,back_populates='tags', lazy='subquery')
 
 
@@ -56,6 +57,7 @@ class COLLECTION(db.Model):
     lastCrawl = db.Column(db.DateTime)
     totalTweets = db.Column(db.Integer)
     added = db.Column(db.DateTime)
+    exports = db.relationship("EXPORTS", backref='twitter_coll_exports', lazy=True, cascade="save-update, merge, delete")
     tags = db.relationship('TWITTER', secondary=assoc_twitter_collections, lazy='subquery',back_populates='tags')
 
 
@@ -101,6 +103,21 @@ class TWITTER_TRENDS(db.Model):
         self.collected = collected
         self.saved = saved
 
+class EXPORTS (db.Model):
+    __tablename__ = 'EXPORTS'
+    row_id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String(250))
+    type = db.Column(db.String(50))
+    exported = db.Column(db.DateTime)
+    count = db.Column(db.String(250))
+    twitter_id = db.Column(db.Integer, db.ForeignKey('TWITTER.row_id'), nullable=True)
+    collection_id = db.Column(db.Integer, db.ForeignKey('COLLECTION.row_id'), nullable=True)
+
+    def __init__(self, url, type, exported, count):
+        self.url = url
+        self.type = type
+        self.exported = exported
+        self.count = count
 
 
 class CRAWLLOG(db.Model):

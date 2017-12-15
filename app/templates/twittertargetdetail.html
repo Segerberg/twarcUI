@@ -12,13 +12,14 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <i class="fa fa-twitter fa-fw"></i> Description
-                   <div class="btn-group pull-right">
-                     <button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></button>
+
+                <div class="btn-group pull-right">
+                     <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions <span class="caret"></span></button>
                      <ul class="dropdown-menu">
-                         <div class="btn-group-vertical btn-group-justified">
-                         <form class="btn-group" method="post" onclick="return confirm('Are you sure you want to start archiving?');"action="{{ url_for('startTwitterCrawl', id=TWITTER.row_id) }}"><button class="btn btn-primary btn-xs pull-right"type="submit">Archive now!</i></button></form>
-                         <form class="btn-group" method="post" onclick="return confirm('Are you sure you wan't to delete this collection?');"action="{{ url_for('removeTwitterTarget', id=TWITTER.row_id) }}"><button class="btn btn-danger btn-xs"type="submit">Delete</i></button></form>
-                        </div>
+                         <li><a href="{{ url_for('startTwitterCrawl', id=TWITTER.row_id) }}"><i class="fa fa-download fa-fw"></i> Archive</a></li>
+                          <li><a href="{{ url_for('dehydrate', id=TWITTER.row_id) }}"><i class="fa fa-tint fa-fw"></i> Dehydrate</a></li>
+                          <li role="separator" class="divider"></li>
+                         <li><a href="{{ url_for('removeTwitterTarget', id=TWITTER.row_id) }}"><i class="fa fa-trash fa-fw"></i> Delete</a></li>
                      </ul>
                  </div>
 
@@ -123,7 +124,7 @@
 </div>
 
  <div class="row">
-     <div class="col-lg-12">
+     <div class="col-lg-4">
          <div class="panel panel-default">
              <div class="panel-heading">
                  <i class="fa fa-book fa-fw"></i> Add target to collection
@@ -141,16 +142,59 @@
              </div>
          </div>
      </div>
- </div>
- <div class="row">
-     <div class="col-lg-12">
+
+
+     <div class="col-lg-8">
+         <div class="panel panel-default">
+             <div class="panel-heading">
+                 <i class="fa fa-book fa-fw"></i> EXPORTS
+             </div>
+             <div class="panel-body">
+                 <div class="table-responsive">
+                 <table class="table table-bordered">
+                     <thead>
+                     <tr>
+                         <th><i class="fa fa-download fa-fw"></i> Export</th>
+                         <th><i class="fa fa-clock-o fa-fw"></i>Time</th>
+                         <th><i class="fa fa-rocket fa-fw"></i>Actions</th>
+                         <th><i class="fa fa-twitter fa-fw"></i>Tweets</th>
+                     </tr>
+                     </thead>
+                     <tbody>
+                     {% for EXPORT in EXPORTS %}
+                     <tr>
+                         <td><a href="{{ url_for('export', filename=EXPORT.url)}}"download="export">{{ EXPORT.type}}</a></td>
+                         {% if EXPORT.exported == None %}
+                         <td>N/A</td>
+                         {% else %}
+                         <td>{{ EXPORT.exported.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+                         <td><a href="{{ url_for('deleteexport', filename=EXPORT.url)}}"><i class="fa fa-trash fa-fw"></i></a></td>
+                         {% endif %}
+                         {% if EXPORT.count == None %}
+                         <td>N/A</td>
+                         {% else %}
+                         <td>{{EXPORT.count}}</td>
+                         {% endif %}
+
+                     </tr>
+                             {% endfor %}
+                     </tbody>
+                 </table>
+                 </div>
+             </div>
+         </div>
+     </div>
+
+
+     <div class="col-lg-8">
          <div class="panel panel-default">
              <div class="panel-heading"><a data-toggle="collapse" href="#collapse1">
-                 <i class="fa fa-book fa-fw"></i> EVENTLOG </a>
+                 <i class="fa fa-book fa-fw"></i> EVENT LOG </a>
              </div>
              <div class="panel-body">
                  <div id="collapse1" class="panel-collapse collapse in">
                      <div class="dataTable_wrapper">
+                         <div class="table-responsive">
                          <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                              <thead>
                                  <tr>
@@ -167,6 +211,7 @@
                              {% endfor %}
                              </tbody>
                          </table>
+                             </div>
                      </div>
                  </div>
              </div>

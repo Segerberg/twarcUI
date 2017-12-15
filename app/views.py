@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from app import app, render_template, request,db, url_for, redirect,flash,Response,jsonify
+from app import app, render_template, request,db, url_for, redirect,flash,Response,jsonify, send_from_directory
 from app import models
 from .forms import twitterTargetForm, SearchForm, twitterCollectionForm, collectionAddForm, twitterTrendForm
 from sqlalchemy.exc import IntegrityError
 from .twarcUIarchive import twittercrawl
 from .twitterTrends import getTrends
+from .dehydrate import dehydrateUserSearch,dehydrateCollection
 from config import POSTS_PER_PAGE, REDIS_DB, MAP_VIEW,MAP_ZOOM
 from datetime import datetime, timedelta
 from redislite import Redis
 from rq import Queue
 from rq.worker import Worker
+import os
 
 
 q = Queue(connection=Redis(REDIS_DB))
@@ -299,6 +301,7 @@ def twittertargetDetail(id):
     TWITTER = models.TWITTER.query.filter(models.TWITTER.row_id == id).first()
     object = models.TWITTER.query.get_or_404(id)
     CRAWLLOG = models.CRAWLLOG.query.order_by(models.CRAWLLOG.row_id.desc()).filter(models.CRAWLLOG.tag_id==id)
+    EXPORTS = models.EXPORTS.query.order_by(models.EXPORTS.row_id.desc()).filter(models.EXPORTS.twitter_id==id)
     form = twitterTargetForm(prefix='form',obj=object)
     assForm = collectionAddForm(prefix="assForm")
     linkedCollections = models.TWITTER.query. \
@@ -327,13 +330,14 @@ def twittertargetDetail(id):
 
 
 
-    return render_template("twittertargetdetail.html", TWITTER=TWITTER, form=form, CRAWLLOG=CRAWLLOG, linkedCollections=linkedCollections, assForm=assForm)
+    return render_template("twittertargetdetail.html", TWITTER=TWITTER, form=form, CRAWLLOG=CRAWLLOG, EXPORTS=EXPORTS, linkedCollections=linkedCollections, assForm=assForm)
 
 '''Route to detail view of collections'''
 @app.route('/collectiondetail/<id>', methods=['GET', 'POST'])
 def collectionDetail(id):
     object = models.COLLECTION.query.get_or_404(id)
     targets = models.TWITTER.query.all()
+    EXPORTS = models.EXPORTS.query.order_by(models.EXPORTS.row_id.desc()).filter(models.EXPORTS.collection_id == id)
     #CRAWLLOG = models.CRAWLLOG.query.order_by(models.CRAWLLOG.row_id.desc()).filter(models.CRAWLLOG.tag_id==id)
     linkedTargets =  models.COLLECTION.query.\
                     filter(models.COLLECTION.row_id==id).\
@@ -403,7 +407,7 @@ def collectionDetail(id):
             db.session.rollback()
         return redirect(url_for('collectionDetail', id=id))
 
-    return render_template("collectiondetail.html",  object = object, targets=targets,collectionForm=collectionForm, targetForm=targetForm,searchApiForm=searchApiForm, linkedTargets=linkedTargets)
+    return render_template("collectiondetail.html",  object = object, targets=targets,collectionForm=collectionForm, targetForm=targetForm,searchApiForm=searchApiForm, linkedTargets=linkedTargets, EXPORTS=EXPORTS)
 
 '''
 Route to add collection <--> target association
@@ -503,5 +507,45 @@ def startCollectionCrawl(id):
         db.session.close()
         return redirect(url_for('collectionDetail', id=id))
 
+'''
+Route to call simple dehydrate 
+'''
+@app.route('/dehydrate/<id>', methods=['GET','POST'])
+def dehydrate(id):
+    if '/twittertargets/' in request.referrer:
+        q.enqueue(dehydrateUserSearch, id)
+        flash(u'Dehydrating, please refresh page!', 'success')
+
+    elif '/collectiondetail/' in request.referrer:
+        q.enqueue(dehydrateCollection, id)
+        flash(u'Dehydrating, please refresh page!', 'success')
+
+    else:
+        flash(u'Ooops something went wrong!', 'danger')
+
+    return redirect(request.referrer)
 
 
+'''
+Route to send exports  
+'''
+@app.route('/export/<filename>')
+def export(filename):
+    return send_from_directory(app.config['EXPORTS_BASEDIR'],
+                               filename)
+
+'''
+Route to send exports  
+'''
+@app.route('/deleteexport/<filename>')
+def deleteexport(filename):
+    try:
+        os.remove(os.path.join(app.config['EXPORTS_BASEDIR'],filename))
+        flash(u'Export file deleted!', 'success')
+    except:
+        flash(u'The file seems to be missing! But the DB-record was deleted', 'danger')
+    export = db.session.query(models.EXPORTS).filter(models.EXPORTS.url == filename).one()
+    db.session.delete(export)
+    db.session.commit()
+    db.session.close()
+    return redirect(request.referrer)
