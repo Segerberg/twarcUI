@@ -10,6 +10,8 @@
     <meta name="author" content="">
 
     <title>TwarcUI</title>
+     <!-- Font-Awesome -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
     <!-- Bootstrap Core CSS -->
     <link href="{{ url_for('static', filename = 'bower_components/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -20,10 +22,12 @@
 
 
     <!-- Font-Awesome -->
-    <link href="{{ url_for('static', filename = 'bower_components/font-awesome/css/font-awesome.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='bower_components/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
+    <!--<link href="{{ url_for('static', filename = 'bower_components/font-awesome/css/font-awesome.css') }}" rel="stylesheet" type="text/css">-->
     <link href="https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.min.css" media="all" rel="stylesheet" type="text/css" />
 
     {% block head %}
+
     {% endblock %}
   </head>
   <body>
@@ -119,6 +123,7 @@
                     <script src="{{ url_for('static', filename = 'js/raphael-2.1.4.min.js') }}"></script>
 
                     {% block content %}
+
 
                     {% endblock %}
 
