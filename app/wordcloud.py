@@ -19,14 +19,17 @@ def wordCloud(id):
     MAX_WORDS = 200
 
     word_counts = {}
-    stop_words = set(["a","able","about","across","after","all","almost","also","am","among","an","and","any","are","as","at","be","because","been","but","by","can","cannot","could","dear","did","do","does","either","else","ever","every","for","from","get","got","had","has","have","he","her","hers","him","his","how","however","i","if","in","into","is","it","its","just","least","let","like","likely","may","me","might","most","must","my","neither","no","nor","not","of","off","often","on","only","or","other","our","own","rather","said","say","says","she","should","since","so","some","than","that","the","their","them","then","there","these","they","this","tis","to","too","twas","us","wants","was","we","were","what","when","where","which","while","who","whom","why","will","with","would","yet","you","your"])
+    stop_words = set([])
+    q = models.STOPWORDS.query.all()
+    for line in q:
+        stop_words.add(line.stop_word)
 
     if not os.path.isdir(EXPORTS_BASEDIR):
         os.makedirs(EXPORTS_BASEDIR)
     q = models.TWITTER.query.filter(models.TWITTER.row_id == id).first()
 
     for filename in os.listdir(os.path.join(ARCHIVE_BASEDIR, q.title)):
-        if filename.endswith(".jsonl.gz"):
+        if filename.endswith(".gz"):
             for line in gzip.open(os.path.join(ARCHIVE_BASEDIR, q.title, filename)):
 
                 tweet = json.loads(line.decode('utf-8'))
@@ -125,7 +128,7 @@ def wordCloudCollection(id):
     MAX_WORDS = 200
 
     word_counts = {}
-    stop_words = set(["a","able","about","across","after","all","almost","also","am","among","an","and","any","are","as","at","be","because","been","but","by","can","cannot","could","dear","did","do","does","either","else","ever","every","for","from","get","got","had","has","have","he","her","hers","him","his","how","however","i","if","in","into","is","it","its","just","least","let","like","likely","may","me","might","most","must","my","neither","no","nor","not","of","off","often","on","only","or","other","our","own","rather","said","say","says","she","should","since","so","some","than","that","the","their","them","then","there","these","they","this","tis","to","too","twas","us","wants","was","we","were","what","when","where","which","while","who","whom","why","will","with","would","yet","you","your"])
+    stop_words = set(["och","att","inte","a","able","about","across","after","all","almost","also","am","among","an","and","any","are","as","at","be","because","been","but","by","can","cannot","could","dear","did","do","does","either","else","ever","every","for","from","get","got","had","has","have","he","her","hers","him","his","how","however","i","if","in","into","is","it","its","just","least","let","like","likely","may","me","might","most","must","my","neither","no","nor","not","of","off","often","on","only","or","other","our","own","rather","said","say","says","she","should","since","so","some","than","that","the","their","them","then","there","these","they","this","tis","to","too","twas","us","wants","was","we","were","what","when","where","which","while","who","whom","why","will","with","would","yet","you","your"])
 
     if not os.path.isdir(EXPORTS_BASEDIR):
         os.makedirs(EXPORTS_BASEDIR)
@@ -135,8 +138,9 @@ def wordCloudCollection(id):
         first(). \
         tags
     for target in linkedTargets:
+
         for filename in os.listdir(os.path.join(ARCHIVE_BASEDIR, target.title)):
-            if filename.endswith(".jsonl.gz"):
+            if filename.endswith(".gz"):
                 for line in gzip.open(os.path.join(ARCHIVE_BASEDIR, target.title, filename)):
 
                     tweet = json.loads(line.decode('utf-8'))

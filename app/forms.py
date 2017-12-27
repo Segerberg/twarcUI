@@ -40,3 +40,6 @@ class twitterTrendForm(FlaskForm):
 
 
 
+class stopWordsForm(FlaskForm):
+    stopWord = StringField(u'Stop Word', validators=[DataRequired()])
+

@@ -18,8 +18,8 @@ from app import app, models, db, current_app
 from datetime import datetime
 from config import ARCHIVE_BASEDIR,CONSUMER_KEY,CONSUMER_SECRET,ACCESS_TOKEN,ACCESS_SECRET
 
-archive_file_fmt = "tweets-%04i.jsonl.gz"
-archive_file_pat = "tweets-(\d+).jsonl.gz$"
+archive_file_fmt = "tweets-%04i.json.gz"
+archive_file_pat = "tweets-(\d+).json.gz$"
 
 
 def twittercrawl(id):

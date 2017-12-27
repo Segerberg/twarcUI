@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from app import app, render_template, request,db, url_for, redirect,flash,Response,jsonify, send_from_directory
 from app import models
-from .forms import twitterTargetForm, SearchForm, twitterCollectionForm, collectionAddForm, twitterTrendForm
+from .forms import twitterTargetForm, SearchForm, twitterCollectionForm, collectionAddForm, twitterTrendForm, stopWordsForm
 from sqlalchemy.exc import IntegrityError
 from .twarcUIarchive import twittercrawl
 from .twitterTrends import getTrends
@@ -476,7 +476,7 @@ def startTwitterCrawl(id):
         db.session.close()
         flash(u'Archiving started!',  'success')
         object = models.TWITTER.query.get_or_404(id)
-        q.enqueue(twittercrawl, id)
+        q.enqueue(twittercrawl, id, timeout=86400)
         if object.targetType == "Search":
             return redirect('/twittersearchtargets')
         else:
@@ -504,7 +504,7 @@ def startCollectionCrawl(id):
             last_crawl.lastCrawl = datetime.now()
             db.session.commit()
             flash(u'Archiving started!',  'success')
-            q.enqueue(twittercrawl, target.row_id)
+            q.enqueue(twittercrawl, target.row_id, timeout=86400)
         db.session.close()
         return redirect(url_for('collectionDetail', id=id))
 
@@ -514,11 +514,11 @@ Route to call simple dehydrate
 @app.route('/dehydrate/<id>', methods=['GET','POST'])
 def dehydrate(id):
     if '/twittertargets/' in request.referrer:
-        q.enqueue(dehydrateUserSearch, id)
+        q.enqueue(dehydrateUserSearch, id, timeout=86400)
         flash(u'Dehydrating, please refresh page!', 'success')
 
     elif '/collectiondetail/' in request.referrer:
-        q.enqueue(dehydrateCollection, id)
+        q.enqueue(dehydrateCollection, id, timeout=86400)
         flash(u'Dehydrating, please refresh page!', 'success')
 
     else:
@@ -533,11 +533,11 @@ Route to call wordCloud
 @app.route('/wordcloud/<id>', methods=['GET','POST'])
 def wordc(id):
     if '/twittertargets/' in request.referrer:
-        q.enqueue(wordCloud, id)
+        q.enqueue(wordCloud, id, timeout=86400)
         flash(u'Generating wordcloud, please refresh page!', 'success')
 
     elif '/collectiondetail/' in request.referrer:
-        q.enqueue(wordCloudCollection, id)
+        q.enqueue(wordCloudCollection, id, timeout=86400)
         flash(u'Generating wordcloud, please refresh page!', 'success')
 
     else:
@@ -555,7 +555,7 @@ def export(filename):
                                filename)
 
 '''
-Route to send exports  
+Route to delete exports  
 '''
 @app.route('/deleteexport/<filename>')
 def deleteexport(filename):
@@ -569,3 +569,62 @@ def deleteexport(filename):
     db.session.commit()
     db.session.close()
     return redirect(request.referrer)
+
+'''SETTINGS ROUTE'''
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    stopWords = models.STOPWORDS.query.all()
+    stopForm = stopWordsForm()
+
+    if request.method == 'POST' and stopForm.validate_on_submit():
+        print (request.path)
+        add_stop_words = models.STOPWORDS(stop_word=stopForm.stopWord.data, lang=None)
+        db.session.add(add_stop_words)
+        db.session.commit()
+        flash(u'{} was added to Stop word list!'.format(stopForm.stopWord.data), 'success')
+        return redirect(request.referrer)
+
+    return render_template("settings.html", stopWords = stopWords, stopForm = stopForm)
+
+
+'''Route to remove stop word'''
+@app.route('/removestopword/<id>', methods=['GET', 'POST'])
+def removestopword(id):
+    object = object =  db.session.query(models.STOPWORDS).get(id)
+    db.session.delete(object)
+    db.session.commit()
+    flash(u'{} was removed from stop word list!'.format(object.stop_word), 'success')
+    return redirect(request.referrer)
+
+
+# Function to control allowed file extensions
+ALLOWED_EXTENSIONS = set(['txt'])
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/uploadstopwords', methods=['GET','POST'])
+def uploadStopWords():
+
+    if request.method == 'POST':
+        file = request.files['file']
+        if 'file' not in request.files:
+            flash(u'No file part','danger')
+            return redirect(request.referrer)
+        if file.filename == '':
+            flash(u'No selected file','danger')
+            return redirect(request.referrer)
+        if not allowed_file(file.filename):
+            flash(u'Only txt-files allowed', 'danger')
+            return redirect(request.referrer)
+
+        if file and allowed_file(file.filename):
+            lineCount = 0
+            for line in file.readlines():
+                lineCount = lineCount + 1
+                addUrl = models.STOPWORDS(stop_word=line.decode('utf-8'), lang=None)
+                db.session.add(addUrl)
+
+        db.session.commit()
+        flash(u'{} stop words added!'.format(lineCount), 'success')
+        return redirect(request.referrer)

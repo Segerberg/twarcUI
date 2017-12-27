@@ -161,4 +161,22 @@ class SEARCH(db.Model):
             return '<Text %r>' % (self.text)
 
 
+class STOPWORDS(db.Model):
+    __tablename__ = 'STOPWORDS'
+    row_id = db.Column(db.Integer, primary_key=True)
+    stop_word = db.Column(db.String(250))
+    lang = db.Column(db.String(50))
+
+    def __init__(self,stop_word, lang):
+        self.stop_word = stop_word
+        self.lang = lang
+
+class VOCABS(db.Model):
+    __tablename__ = 'VOCABS'
+    row_id = db.Column(db.Integer, primary_key=True)
+    term = db.Column(db.String(250))
+    use = db.Column(db.String(50))
+    def __init__(self,term, use):
+        self.term = term
+        self.use = use
 

@@ -14,7 +14,7 @@ def dehydrateUserSearch(id):
     q = models.TWITTER.query.filter(models.TWITTER.row_id == id).first()
     with open(os.path.join(EXPORTS_BASEDIR, '{}_simple_dehydrate_UUID_{}.txt'.format(q.title, export_uuid)), 'w+') as f:
         for filename in os.listdir(os.path.join(ARCHIVE_BASEDIR,q.title)):
-            if filename.endswith(".jsonl.gz"):
+            if filename.endswith(".gz"):
                 for line in gzip.open(os.path.join(ARCHIVE_BASEDIR,q.title,filename)):
                     count = count + 1
                     tweet = json.loads(line.decode('utf-8'))['id_str']
@@ -39,7 +39,7 @@ def dehydrateCollection(id):
         for target in linkedTargets:
             print (target.title)
             for filename in os.listdir(os.path.join(ARCHIVE_BASEDIR,target.title)):
-                if filename.endswith(".jsonl.gz"):
+                if filename.endswith(".gz"):
                     for line in gzip.open(os.path.join(ARCHIVE_BASEDIR,target.title,filename)):
                         count = count + 1
                         tweet = json.loads(line.decode('utf-8'))['id_str']

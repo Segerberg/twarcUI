@@ -15,7 +15,7 @@ CONSUMER_SECRET = ''
 ACCESS_TOKEN = ''
 ACCESS_SECRET = ''
 REDIS_DB = os.path.join(basedir, 'redis.rdb')
-MAP_VIEW = '38.618, -90.244'
+MAP_VIEW = '57.70, 12.022'
 MAP_ZOOM = '4'
 
 
