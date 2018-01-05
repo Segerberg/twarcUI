@@ -257,11 +257,12 @@ def userlist(id,page=1):
             db.session.add(addTarget)
             db.session.commit()
             db.session.close()
+            backref = models.TWITTER.query.filter(models.TWITTER.title == form.title.data).first()
 
         except IntegrityError:
             flash(u'Twitter user account already in database ', 'danger')
             db.session.rollback()
-        return redirect(url_for('twittertargets'))
+        return redirect(url_for('twittertargetDetail', id=backref.row_id))
 
 
 
