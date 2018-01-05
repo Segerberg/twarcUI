@@ -426,7 +426,7 @@ def addCollectionAssociation(id, target):
 '''
 Route to remove twitter-target
 '''
-@app.route('/removetwittertarget/<id>', methods=['POST'])
+@app.route('/removetwittertarget/<id>', methods=['GET','POST'])
 def removeTwitterTarget(id):
     object = models.TWITTER.query.get_or_404(id)
     db.session.delete(object)
