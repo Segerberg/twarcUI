@@ -504,9 +504,9 @@ def startCollectionCrawl(id):
             last_crawl = models.TWITTER.query.get(target.row_id)
             last_crawl.lastCrawl = datetime.now()
             db.session.commit()
-            flash(u'Archiving started!',  'success')
             q.enqueue(twittercrawl, target.row_id, timeout=86400)
         db.session.close()
+        flash(u'Archiving started!', 'success')
         return redirect(url_for('collectionDetail', id=id))
 
 '''
