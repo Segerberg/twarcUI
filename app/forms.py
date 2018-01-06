@@ -27,7 +27,7 @@ class twitterCollectionForm(FlaskForm):
     title = StringField(u'Title', validators=[DataRequired()])
     curator = StringField(u'Curator')
     description = TextAreaField(u'Description')
-    collectionType = SelectField(u'Collection Type', choices=[("Event", "Event"),("Subject","Subject")])
+    collectionType = SelectField(u'Collection Type', choices=[("Not Specified", "Not Specified"),("Event", "Event"),("Subject","Subject")])
     subject = StringField(u'Subject')
     status = SelectField(u'Status', choices=[("1", "Active"),("0","Closed")])
 
