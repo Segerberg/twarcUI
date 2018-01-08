@@ -217,7 +217,8 @@ def collections():
             addTarget = models.COLLECTION(title=collectionForm.title.data, curator=collectionForm.curator.data,
                                        collectionType=collectionForm.collectionType.data,
                                        description=collectionForm.description.data, subject=collectionForm.subject.data,
-                                       status=collectionForm.status.data, lastCrawl=None,
+                                       status=collectionForm.status.data, inclDateStart=collectionForm.inclDateStart.data,
+                                       inclDateEnd=collectionForm.inclDateStart.data, lastCrawl=None,
                                        totalTweets=0, added=datetime.now())
 
             #addLog = models.CRAWLLOG(tag_title=form.title.data, event_start=datetime.now(),
@@ -232,6 +233,7 @@ def collections():
         except IntegrityError:
             flash(u'Collection name is already in use! ', 'danger')
             db.session.rollback()
+
 
     return render_template("collections.html", COLLECTIONS=COLLECTIONS, collectionForm=collectionForm)
 
@@ -268,7 +270,7 @@ def userlist(id,page=1):
 
     return render_template("usertweets.html", results=results,id=id, twitterTarget=twitterTarget,form=form)
 
-'''Route to view archived user tweets '''
+'''Route to view archived user tweets from twitter searches '''
 @app.route('/searchtweets/<id>/<int:page>', methods=['GET', 'POST'])
 def searchlist(id,page=1):
     id=id

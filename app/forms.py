@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from app import models, db
-from wtforms import StringField, BooleanField, SelectField, DateField, FieldList, FormField, TextAreaField, SelectMultipleField, widgets
+from wtforms import StringField, BooleanField, SelectField,  FieldList, FormField, TextAreaField, SelectMultipleField, widgets,validators
+from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired,Regexp
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
@@ -30,6 +31,8 @@ class twitterCollectionForm(FlaskForm):
     collectionType = SelectField(u'Collection Type', choices=[("Not Specified", "Not Specified"),("Event", "Event"),("Subject","Subject")])
     subject = StringField(u'Subject')
     status = SelectField(u'Status', choices=[("1", "Active"),("0","Closed")])
+    inclDateStart = DateField(u'Inclusive start date',format='%Y-%m-%d')
+    inclDateEnd = DateField(u'Inclusive end date',[validators.Optional()],format='%Y-%m-%d')
 
 
 class SearchForm(FlaskForm):

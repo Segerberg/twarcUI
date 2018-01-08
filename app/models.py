@@ -54,6 +54,8 @@ class COLLECTION(db.Model):
     description = db.Column(db.Text)
     subject = db.Column(db.String(50))
     status = db.Column(db.String(50))
+    inclDateStart = db.Column(db.DateTime)
+    inclDateEnd = db.Column(db.DateTime)
     lastCrawl = db.Column(db.DateTime)
     totalTweets = db.Column(db.Integer)
     added = db.Column(db.DateTime)
@@ -61,13 +63,15 @@ class COLLECTION(db.Model):
     tags = db.relationship('TWITTER', secondary=assoc_twitter_collections, lazy='subquery',back_populates='tags')
 
 
-    def __init__(self, title,  curator, collectionType, description, subject, status, lastCrawl, totalTweets, added):
+    def __init__(self, title,  curator, collectionType, description, subject, status,inclDateStart,inclDateEnd, lastCrawl, totalTweets, added):
         self.title = title
         self.curator = curator
         self.collectionType = collectionType
         self.description = description
         self.subject = subject
         self.status = status
+        self.inclDateStart =inclDateStart
+        self.inclDateEnd = inclDateEnd
         self.lastCrawl = lastCrawl
         self.added = added
         self.totalTweets = totalTweets
