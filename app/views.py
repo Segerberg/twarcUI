@@ -625,7 +625,8 @@ def uploadStopWords():
             lineCount = 0
             for line in file.readlines():
                 lineCount = lineCount + 1
-                addUrl = models.STOPWORDS(stop_word=line.decode('utf-8'), lang=None)
+                stopWord = line.decode('utf-8').replace('\n','')
+                addUrl = models.STOPWORDS(stop_word=stopWord, lang=None)
                 db.session.add(addUrl)
 
         db.session.commit()
