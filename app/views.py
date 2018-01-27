@@ -440,9 +440,9 @@ def removeTwitterTarget(id):
     db.session.commit()
     db.session.close()
     if object.targetType == 'Search':
-        return redirect('/twittersearchtargets')
+        return redirect('/twittersearchtargets/1')
     else:
-        return redirect('/twittertargets')
+        return redirect('/twittertargets/1')
 
 '''
 Route to remove collection
