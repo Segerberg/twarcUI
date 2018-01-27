@@ -28,7 +28,7 @@ The kurbits is an invented, fantastical symbol principally used for ornamentatio
 and on painted furniture and domestic objects. Very popular between 1720 and 1870, particularly in Dalarna and southern Norrland.
 Dalecarlian horses, are probably the most famous artifacts painted in the kurbits style.
 
-As a word game Kurbits can be an abbrivation of "kultur-arvs-bits" (culture heritage bits) (With a little good imagination in swedish)
+As a word game Kurbits can be an abbrivation of "kulturarvs-bits" (culture heritage bits) (With a little good imagination in swedish)
 Artist Tove Bengtsson took the idea of classic kurbits illustration and mixed in web preservation, spider and a bit!
 
 Logo is kindly licensed by Tove under CC BY-NC-SA
