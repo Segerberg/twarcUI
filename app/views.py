@@ -6,7 +6,7 @@ from .forms import twitterTargetForm, SearchForm, twitterCollectionForm, collect
 from sqlalchemy.exc import IntegrityError
 from .twarcUIarchive import twittercrawl
 from .twitterTrends import getTrends
-from .getFollowers import getFollowers
+from .getFollowers import Followers
 from .dehydrate import dehydrateUserSearch,dehydrateCollection
 from .wordcloud import wordCloud, wordCloudCollection
 from config import POSTS_PER_PAGE, REDIS_DB, MAP_VIEW,MAP_ZOOM,TARGETS_PER_PAGE
@@ -518,6 +518,18 @@ def startCollectionCrawl(id):
             q.enqueue(twittercrawl, target.row_id, timeout=86400)
         db.session.close()
         return redirect(url_for('collectionDetail', id=id, page=1))
+
+'''
+Route to call followers
+'''
+@app.route('/followers/<id>', methods=['GET','POST'])
+def followers(id):
+
+    q.enqueue(Followers, id, timeout=86400)
+    flash(u'Getting followers, please refresh page!', 'success')
+    return redirect(request.referrer)
+
+
 
 '''
 Route to call simple dehydrate 

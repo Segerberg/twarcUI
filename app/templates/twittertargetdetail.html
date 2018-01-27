@@ -151,6 +151,7 @@
                      <ul class="dropdown-menu">
                          <li><a href="{{ url_for('dehydrate', id=TWITTER.row_id) }}"><i class="fa fa-tint fa-fw"></i> Dehydrate</a></li>
                          <li><a href="{{ url_for('wordc', id=TWITTER.row_id) }}"><i class="fa fa-cloud fa-fw"></i> Wordcloud</a></li>
+                          {% if TWITTER.targetType == 'User' %}<li><a href="{{ url_for('followers', id=TWITTER.row_id) }}"><i class="fa fa-users fa-fw"></i> Followers</a></li> {% endif %}
                      </ul>
                  </div>
              </div>
@@ -162,7 +163,7 @@
                          <th><i class="fa fa-download fa-fw"></i> Export</th>
                          <th><i class="fa fa-clock-o fa-fw"></i>Time</th>
                          <th><i class="fa fa-rocket fa-fw"></i>Actions</th>
-                         <th><i class="fa fa-twitter fa-fw"></i>Tweets</th>
+                         <th><i class="fa fa-twitter fa-fw"></i>No</th>
                      </tr>
                      </thead>
                      <tbody>
