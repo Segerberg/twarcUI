@@ -31,7 +31,7 @@ class twitterCollectionForm(FlaskForm):
     collectionType = SelectField(u'Collection Type', choices=[("Not Specified", "Not Specified"),("Event", "Event"),("Subject","Subject")])
     subject = StringField(u'Subject')
     status = SelectField(u'Status', choices=[("1", "Active"),("0","Closed")])
-    inclDateStart = DateField(u'Inclusive start date',format='%Y-%m-%d')
+    inclDateStart = DateField(u'Inclusive start date',[validators.Optional()],format='%Y-%m-%d')
     inclDateEnd = DateField(u'Inclusive end date',[validators.Optional()],format='%Y-%m-%d')
 
 

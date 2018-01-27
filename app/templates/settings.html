@@ -23,7 +23,9 @@
         </form>
 <br>
                 <button type="button" class="btn btn-primary btn-xs pull-right" data-toggle="collapse" data-target="#demo">Batch upload</button>
+  <br>
    <div id="demo" class="collapse in">
+       <br>
  <form method=post action="{{ url_for('uploadStopWords')}}" enctype=multipart/form-data>
      <div class="input-group">
           <span class="input-group-btn">
@@ -34,7 +36,7 @@
      </div>
     </form>
    </div>
-
+<br>
                 <table id="stopWordTable" class="table table-bordered">
                         <tr>
                             <th>Word</th>

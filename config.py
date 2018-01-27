@@ -7,6 +7,7 @@ SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 #WARCPROX_LISTNING_PORT = 9002
 POSTS_PER_PAGE = 90
+TARGETS_PER_PAGE = 500
 ARCHIVE_BASEDIR = os.path.join(basedir, 'jobs')
 EXPORTS_BASEDIR = os.path.join(basedir, 'exports')
 TEMP_BASEDIR = os.path.join(basedir, 'temp')

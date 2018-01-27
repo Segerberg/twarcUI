@@ -28,12 +28,12 @@ def wordCloud(id):
     if not os.path.isdir(EXPORTS_BASEDIR):
         os.makedirs(EXPORTS_BASEDIR)
     q = models.TWITTER.query.filter(models.TWITTER.row_id == id).first()
-
     for filename in os.listdir(os.path.join(ARCHIVE_BASEDIR, q.title)):
         if filename.endswith(".gz"):
             for line in gzip.open(os.path.join(ARCHIVE_BASEDIR, q.title, filename)):
 
                 tweet = json.loads(line.decode('utf-8'))
+
 
                 for word in text(tweet).split(' '):
                     word = word.lower()
@@ -137,7 +137,22 @@ def wordCloudCollection(id):
 
     if not os.path.isdir(EXPORTS_BASEDIR):
         os.makedirs(EXPORTS_BASEDIR)
+
     q = models.COLLECTION.query.filter(models.COLLECTION.row_id == id).first()
+    dbDateStart = q.inclDateStart
+    dbDateStop = q.inclDateEnd
+    print (dbDateStart)
+    print (dbDateStop)
+    if dbDateStop == None:
+        dbDateStop = datetime.max
+
+    if dbDateStart == None:
+        print ('dbdateStop')
+        dbDateStart = datetime.min
+
+
+
+
     linkedTargets = models.COLLECTION.query. \
         filter(models.COLLECTION.row_id == id). \
         first(). \
@@ -149,18 +164,22 @@ def wordCloudCollection(id):
                 for line in gzip.open(os.path.join(ARCHIVE_BASEDIR, target.title, filename)):
 
                     tweet = json.loads(line.decode('utf-8'))
+                    tweetDate = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
 
-                    for word in text(tweet).split(' '):
-                        word = word.lower()
-                        word = word.replace(".", "")
-                        if len(word) < 3: continue
-                        if len(word) > 15: continue
-                        if word in stop_words: continue
-                        if word[0] in ["@", "#"]: continue
-                        if re.match('https?', word): continue
-                        if word.startswith("rt"): continue
-                        if not re.match('^[a-z]', word, re.IGNORECASE): continue
-                        word_counts[word] = word_counts.get(word, 0) + 1
+                    if tweetDate > dbDateStart and tweetDate < dbDateStop:
+                        print(tweetDate)
+
+                        for word in text(tweet).split(' '):
+                            word = word.lower()
+                            word = word.replace(".", "")
+                            if len(word) < 3: continue
+                            if len(word) > 15: continue
+                            if word in stop_words: continue
+                            if word[0] in ["@", "#"]: continue
+                            if re.match('https?', word): continue
+                            if word.startswith("rt"): continue
+                            if not re.match('^[a-z]', word, re.IGNORECASE): continue
+                            word_counts[word] = word_counts.get(word, 0) + 1
 
         sorted_words = list(word_counts.keys())
         sorted_words.sort(key = lambda x: word_counts[x], reverse=True)

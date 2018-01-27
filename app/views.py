@@ -8,13 +8,13 @@ from .twarcUIarchive import twittercrawl
 from .twitterTrends import getTrends
 from .dehydrate import dehydrateUserSearch,dehydrateCollection
 from .wordcloud import wordCloud, wordCloudCollection
-from config import POSTS_PER_PAGE, REDIS_DB, MAP_VIEW,MAP_ZOOM
+from config import POSTS_PER_PAGE, REDIS_DB, MAP_VIEW,MAP_ZOOM,TARGETS_PER_PAGE
 from datetime import datetime, timedelta
 from redislite import Redis
 from rq import Queue
 from rq.worker import Worker
 import os
-
+from .decorators import async
 
 q = Queue(connection=Redis(REDIS_DB))
 
@@ -61,9 +61,10 @@ TWITTER
 '''
 
 '''USER-TIMELINES'''
-@app.route('/twittertargets', methods=['GET', 'POST'])
-def twittertargets():
-    TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType=='User')
+@app.route('/twittertargets/<int:page>', methods=['GET', 'POST'])
+def twittertargets(page=1):
+    #TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType=='User')
+    TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType=='User').order_by(models.TWITTER.title).paginate(page, TARGETS_PER_PAGE,False)
     form = twitterTargetForm(prefix='form')
 
     if request.method == 'POST'and form.validate_on_submit():
@@ -87,6 +88,7 @@ def twittertargets():
             db.session.rollback()
 
     return render_template("twittertargets.html", TWITTER=TWITTER, form=form)
+
 
 
 '''TRENDS'''
@@ -182,9 +184,10 @@ def refreshtwittertrend():
 
 
 '''API-SEARCH-TARGETS'''
-@app.route('/twittersearchtargets', methods=['GET', 'POST'])
-def twittersearchtargets():
-    TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType=='Search')
+@app.route('/twittersearchtargets/<int:page>', methods=['GET', 'POST'])
+def twittersearchtargets(page=1):
+    #TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType=='Search')
+    TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType == 'Search').order_by(models.TWITTER.title).paginate(page, TARGETS_PER_PAGE, False)
     templateType = "Search"
     form = twitterTargetForm(prefix='form')
     if request.method == 'POST'and form.validate_on_submit():
@@ -208,9 +211,10 @@ def twittersearchtargets():
     return render_template("twittertargets.html", TWITTER=TWITTER, form=form, templateType = templateType)
 
 '''COLLECTIONS'''
-@app.route('/collections', methods=['GET', 'POST'])
-def collections():
-    COLLECTIONS = models.COLLECTION.query.filter(models.COLLECTION.status == '1')
+@app.route('/collections/<int:page>', methods=['GET', 'POST'])
+def collections(page=1):
+    COLLECTIONS = models.COLLECTION.query.filter(models.COLLECTION.status == '1').order_by(models.COLLECTION.title).paginate(page, TARGETS_PER_PAGE, False)
+
     collectionForm = twitterCollectionForm(prefix='collectionForm')
     if request.method == 'POST' and collectionForm.validate_on_submit():
         try:
@@ -299,7 +303,7 @@ def searchlist(id,page=1):
     return render_template("usertweets.html", results=results,id=id, twitterTarget=twitterTarget,form=form)
 
 '''Route to detail view of twitter user/search target'''
-@app.route('/twittertargets/<id>', methods=['GET', 'POST'])
+@app.route('/twittertargetsdetail/<id>', methods=['GET', 'POST'])
 def twittertargetDetail(id):
 
     TWITTER = models.TWITTER.query.filter(models.TWITTER.row_id == id).first()
@@ -337,16 +341,15 @@ def twittertargetDetail(id):
     return render_template("twittertargetdetail.html", TWITTER=TWITTER, form=form, CRAWLLOG=CRAWLLOG, EXPORTS=EXPORTS, linkedCollections=linkedCollections, assForm=assForm)
 
 '''Route to detail view of collections'''
-@app.route('/collectiondetail/<id>', methods=['GET', 'POST'])
-def collectionDetail(id):
+@app.route('/collectiondetail/<id>/<int:page>', methods=['GET', 'POST'])
+def collectionDetail(id, page=1):
     object = models.COLLECTION.query.get_or_404(id)
-    targets = models.TWITTER.query.all()
+    #targets = models.TWITTER.query.all()
     EXPORTS = models.EXPORTS.query.order_by(models.EXPORTS.row_id.desc()).filter(models.EXPORTS.collection_id == id)
     #CRAWLLOG = models.CRAWLLOG.query.order_by(models.CRAWLLOG.row_id.desc()).filter(models.CRAWLLOG.tag_id==id)
-    linkedTargets =  models.COLLECTION.query.\
-                    filter(models.COLLECTION.row_id==id).\
-                    first().\
-                    tags
+    #TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType == 'User').order_by(models.TWITTER.title).paginate(page, TARGETS_PER_PAGE, False)
+    linkedTargets =  models.COLLECTION.query.filter(models.COLLECTION.row_id==id).first().tags.paginate(page, POSTS_PER_PAGE, False)
+
 
     collectionForm = twitterCollectionForm(prefix='collectionform',obj=object)
     targetForm = twitterTargetForm(prefix='targetform')
@@ -411,7 +414,7 @@ def collectionDetail(id):
             db.session.rollback()
         return redirect(url_for('collectionDetail', id=id))
 
-    return render_template("collectiondetail.html",  object = object, targets=targets,collectionForm=collectionForm, targetForm=targetForm,searchApiForm=searchApiForm, linkedTargets=linkedTargets, EXPORTS=EXPORTS)
+    return render_template("collectiondetail.html",  object = object, collectionForm=collectionForm, targetForm=targetForm,searchApiForm=searchApiForm, linkedTargets=linkedTargets, EXPORTS=EXPORTS)
 
 '''
 Route to add collection <--> target association
@@ -480,10 +483,11 @@ def startTwitterCrawl(id):
         flash(u'Archiving started!',  'success')
         object = models.TWITTER.query.get_or_404(id)
         q.enqueue(twittercrawl, id, timeout=86400)
-        if object.targetType == "Search":
-            return redirect('/twittersearchtargets')
-        else:
-            return redirect('/twittertargets')
+        return redirect(request.referrer)
+        #if object.targetType == "Search":
+        #    return redirect('/twittersearchtargets/1')
+        #else:
+        #    return redirect('/twittertargets/1')
 
 """Route to monitor if job is in queue"""
 @app.route('/_qmonitor', methods=['GET', 'POST'])
@@ -495,9 +499,13 @@ def qmonitor():
 '''
 Route to call collection twarc-archive
 '''
+@async
 @app.route('/startcollectioncrawl/<id>', methods=['GET','POST'])
 def startCollectionCrawl(id):
     with app.app_context():
+        flash(u'Archiving started!', 'success')
+        collectionLastCrawl = models.COLLECTION.query.get(id)
+        collectionLastCrawl.lastCrawl = datetime.now()
         linkedTargets = models.COLLECTION.query. \
             filter(models.COLLECTION.row_id == id). \
             first(). \
@@ -508,8 +516,7 @@ def startCollectionCrawl(id):
             db.session.commit()
             q.enqueue(twittercrawl, target.row_id, timeout=86400)
         db.session.close()
-        flash(u'Archiving started!', 'success')
-        return redirect(url_for('collectionDetail', id=id))
+        return redirect(url_for('collectionDetail', id=id, page=1))
 
 '''
 Route to call simple dehydrate 

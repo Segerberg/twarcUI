@@ -194,10 +194,10 @@
  </div>
   <!-- -------------------------------------- -->
 <div class="row">
-    <div class="col-lg-9">
+    <div class="col-lg-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <div class="panel-title pull-left"><a data-toggle="collapse" href="#collapse2"><i class="fa fa-crosshairs fa-fw"></i>Targets</a></div>
+                <div class="panel-title pull-left"><a data-toggle="collapse" href="#collapse2"><i class="fa fa-crosshairs fa-fw"></i>Associated Targets</a></div>
                 <div class="btn-group pull-right">
                     <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add New <span class="caret"></span></button>
                     <ul class="dropdown-menu">
@@ -209,18 +209,16 @@
                 <div class="clearfix"></div>
             </div>
             <div class="panel-body">
-                <ul class="nav nav-tabs">
-                    <li class="active"><a href="#assocTargets" data-toggle="tab">Associated Targets</a>
-                    </li>
-                    <li><a href="#availTargets" data-toggle="tab">Add Available Targets</a>
-                    </li>
-                </ul>
-                <hr>
-                <div class="tab-content">
-                    <div class="tab-pane fade in active" id="assocTargets">
-                        <div class="dataTable_wrapper">
+                <div class="form-group ">
+
+ <input type="text" id="targetInput" onkeyup="filterTable()" placeholder="Filter...">
+</div>
+<hr>
+
+
+
                                 <div class="table-responsive">
-                                <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                                <table class="table table-striped table-bordered table-hover" id="targetTable">
                                     <thead>
                                     <tr>
                                         <th>Title</th>
@@ -230,59 +228,32 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {% for target in linkedTargets %}
+                                    {% for target in linkedTargets.items %}
                                     <tr>
                                         <td><a href="{{ url_for('twittertargetDetail', id=target.row_id) }}">{{ target.title}}</a></td>
                                         <td>{{ target.targetType}}</td>
                                         <td>{{ target.subject}}</td>
                                         <td>
                                             <div class="form-group pull-right">
-                                                <form method="post" onclick="return confirm('Are you sure you wan't to remove this target from collection?');"action="{{ url_for('removeCollectionAssociation', id=object.row_id, target=target.row_id) }}">
+                                                    <form method="post" onclick="return confirm('Are you sure you wan't to remove this target from collection?');"action="{{ url_for('removeCollectionAssociation', id=object.row_id, target=target.row_id) }}">
                                                     <button class="btn btn-danger btn-xs pull-left"type="submit">Remove</i></button></form></div></td>
                                     </tr>
                                     {% endfor %}
                                     </tbody>
                                 </table>
+                                    <ul class = "pagination">
+{% if linkedTargets.has_prev %}<li><a href="{{ url_for('collectionDetail', id=object.row_id, page=linkedTargets.prev_num) }}">&laquo;</a></li>{% else %}{% endif %}
+{% for page in linkedTargets.iter_pages() %}{% if page == None %} {% else %}  <li><a href="{{ url_for('collectionDetail', id=object.row_id, page=page) }}">{{page}}</a></li>{% endif %}{% endfor %}
+{% if linkedTargets.has_next %}<li><a href="{{ url_for('collectionDetail', id=object.row_id, page=linkedTargets.next_num) }}">&raquo;</a></li>{% else %}{% endif %}
+</ul>
                                 </div>
                         </div>
                     </div>
 
-                    <div class="tab-pane fade" id="availTargets">
-                        <div class="dataTable_wrapper">
-                            <div class="table-responsive">
-                            <table class="table table-striped table-bordered table-hover" id="assocTable">
-                                <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Target Type</th>
-                                    <th>Keywords</th>
-                                    <th>Actions</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for target in targets %}
-                                <tr>
-                                    <td><a href="{{ url_for('twittertargetDetail', id=target.row_id) }}">{{ target.title}}</a></td>
-                                    <td>{{ target.targetType}}</td>
-                                    <td>{{ target.subject}}</td>
-                                    <td>
-                                        <div class="form-group pull-right">
-                                            <form method="post" onclick="return confirm('Are you sure you wan't to add this target to collection');"action="{{ url_for('addCollectionAssociation', id=object.row_id, target=target.row_id) }}"><button class="btn btn-success btn-xs pull-left"type="submit">Add</i></button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+
 
 
 <div class="row">
@@ -354,59 +325,35 @@ $(function () {
   $('[data-toggle="popover"]').popover()
 })
 </script>
+
+<script>$('.collapse').collapse()</script>
 <script>
-$(document).ready(function() {
-    $('#dataTables-example').DataTable( {
-        stateSave: false,
-        aLengthMenu: [
-        [10,25, 50, 100, -1],
-        [10,25, 50, 100, "All"]],
-        responsive: true,
-        "language": {
-            "lengthMenu": "Show _MENU_ ",
-            "zeroRecords": "found nothing...",
-            "info": "showing _PAGE_ of _PAGES_",
-            "infoEmpty": "No records to show",
-            "infoFiltered": "(filtred from total _MAX_ records)",
-             "paginate": {
-             "first":      "First",
-             "last":       "Last",
-             "next":       "Next",
-             "previous":   "Previous"
+function filterTable() {
+  var input, filter, table, tr, td, i;
+  input = document.getElementById("targetInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("targetTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+<script>
+$(document).ready(function()
+    {
+        $("#targetTable").tablesorter();
+    }
+);
 
-    },
-        "search": "Search",
-        }
+</script>
 
-    } );
-} );
- </script>
- <script>
-$(document).ready(function() {
-    $('#assocTable').DataTable( {
-        stateSave: false,
-        aLengthMenu: [
-        [10,25, 50, 100, -1],
-        [10,25, 50, 100, "All"]],
-        responsive: true,
-        "language": {
-            "lengthMenu": "Show _MENU_ ",
-            "zeroRecords": "found nothing...",
-            "info": "showing _PAGE_ of _PAGES_",
-            "infoEmpty": "No records to show",
-            "infoFiltered": "(filtred from total _MAX_ records)",
-             "paginate": {
-             "first":      "First",
-             "last":       "Last",
-             "next":       "Next",
-             "previous":   "Previous"
 
-    },
-        "search": "Search",
-        }
-
-    } );
-} );
- </script>
- <script>$('.collapse').collapse()</script>
 {% endblock %}

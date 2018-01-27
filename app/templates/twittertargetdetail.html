@@ -24,7 +24,6 @@
 
             </div>
             <div class="panel-body">
-                <h5><span class="label label-default">Description</span></h5>
                 <ul class="list-unstyled">
                     {% if TWITTER.targetType == 'User' %}
                     <li><b style="color:grey"> Username:</b> {{ TWITTER.title }}</li>
@@ -59,7 +58,7 @@
                     </tr>
                     {% for collection in linkedCollections %}
                     <tr>
-                        <td><a href={{url_for('collectionDetail', id=collection.row_id)}}><i class="fa fa-link" aria-hidden="true"></i> {{ collection.title }}</a><a href="{{ url_for('removeCollectionAssociation', id=collection.row_id, target=TWITTER.row_id) }}"></a></td>
+                        <td><a href={{url_for('collectionDetail', page="1", id=collection.row_id)}}><i class="fa fa-link" aria-hidden="true"></i> {{ collection.title }}</a><a href="{{ url_for('removeCollectionAssociation', id=collection.row_id, target=TWITTER.row_id) }}"></a></td>
                         <td><form method="post" onclick="return confirm('Are you sure you wan't to remove this target from collection?');"action="{{ url_for('removeCollectionAssociation', id=collection.row_id, target=TWITTER.row_id) }}">
                             <button class="btn btn-danger btn-xs pull-left" type="submit" id="togglee">  <i class="fa fa-trash" aria-hidden="true"></button></form></td>
                     </tr>

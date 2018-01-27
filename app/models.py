@@ -60,7 +60,7 @@ class COLLECTION(db.Model):
     totalTweets = db.Column(db.Integer)
     added = db.Column(db.DateTime)
     exports = db.relationship("EXPORTS", backref='twitter_coll_exports', lazy=True, cascade="save-update, merge, delete")
-    tags = db.relationship('TWITTER', secondary=assoc_twitter_collections, lazy='subquery',back_populates='tags')
+    tags = db.relationship('TWITTER', secondary=assoc_twitter_collections, lazy='dynamic',back_populates='tags')
 
 
     def __init__(self, title,  curator, collectionType, description, subject, status,inclDateStart,inclDateEnd, lastCrawl, totalTweets, added):

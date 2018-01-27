@@ -58,13 +58,13 @@
                             <a href="/twittertargets"><i class="fa fa-twitter fa-fw"></i>Twitter<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="/twittertargets"><i class="fa fa-user fa-fw"></i>User Timelines</a>
+                                    <a href="/twittertargets/1"><i class="fa fa-user fa-fw"></i>User Timelines</a>
                                 </li>
                                 <li>
-                                    <a href="/twittersearchtargets"><i class="fa fa-search fa-fw"></i>API-Searches</a>
+                                    <a href="/twittersearchtargets/1"><i class="fa fa-search fa-fw"></i>API-Searches</a>
                                 </li>
                                 <li>
-                                    <a href="/collections"><i class="fa fa-archive fa-fw"></i>Collections</a>
+                                    <a href="/collections/1"><i class="fa fa-archive fa-fw"></i>Collections</a>
                                 </li>
                                  <li>
                                     <a href="/twittertrends"><i class="fa fa-line-chart fa-fw"></i>Trends</a>
@@ -121,6 +121,7 @@
                     <script src="{{ url_for('static', filename = 'dist/js/sb-admin-2.js') }}"></script>
                     <script src="{{ url_for('static', filename = 'js/justgage.js') }}"></script>
                     <script src="{{ url_for('static', filename = 'js/raphael-2.1.4.min.js') }}"></script>
+                    <script  src="{{ url_for('static', filename = 'js/jquery.tablesorter.min.js') }}"></script>
 
                     {% block content %}
 

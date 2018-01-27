@@ -69,22 +69,32 @@
                 <div class="clearfix"></div>
             </div>
             <div class="panel-body">
-                <div class="dataTable_wrapper">
-                    <table class="table table-striped table-bordered table-hover" id="dataTables-example">
-                        <thead>
+<div class="form-group pull-right">
+    <label>Filter</label>
+ <input type="text" id="targetInput" onkeyup="filterTable()" >
+</div>
+
+
+
+
+                    <table class="table table-striped table-bordered table-hover" id="targetTable">
+
+
+                            <thead>
                             <tr>
-                            {% if templateType == "Search" %} <th>Title</th>{% else %}<th>Username</th>{% endif %}
-                                <th>Archived tweets</th>
-                                <th>Last archived</th>
-                                <th>Added</th>
-                                <th>Keywords</th>
+                            {% if templateType == "Search" %} <th>Title <i class="fa fa-sort pull-right" aria-hidden="true"></i></th>{% else %}<th>Username <i class="fa fa-sort pull-right" aria-hidden="true"></i></th>{% endif %}
+                                <th>Archived tweets <i class="fa fa-sort pull-right" aria-hidden="true"></i></th>
+                                <th>Last archived <i class="fa fa-sort pull-right" aria-hidden="true"></i></th>
+                                <th>Added <i class="fa fa-sort pull-right" aria-hidden="true"></i></th>
+                                <th>Keywords <i class="fa fa-sort pull-right" aria-hidden="true"></i></th>
                                 <th>Actions</th>
                             </tr>
-                        </thead>
+                            </thead>
                         <tbody>
-                        {% for TARGET in TWITTER %}
+
+                        {% for TARGET in TWITTER.items %}
                         <tr>
-                            <td><a href="twittertargets/{{TARGET.row_id }}">{{ TARGET.title}}</td>
+                            <td><a href="{{ url_for('twittertargetDetail', id=TARGET.row_id) }}">{{ TARGET.title}}</td>
                             <td>{{ TARGET.totalTweets}}</td>
                             {% if TARGET.lastCrawl == None %}<td>-</td>{% else %}<td>{{ TARGET.lastCrawl.strftime('%Y-%m-%d')}}</td>{% endif %}
                             <td>{{ TARGET.added.strftime('%Y-%m-%d')}}</td>
@@ -93,35 +103,47 @@
                         </tr>
                         {% endfor %}
                         </tbody>
+
                     </table>
-                </div>
+                                            <ul class = "pagination">
+{% if TWITTER.has_prev %}<li><a href="{{ url_for('twittertargets', page=TWITTER.prev_num) }}">&laquo;</a></li>{% else %}{% endif %}
+{% for page in TWITTER.iter_pages() %}{% if page == None %} {% else %}  <li><a href="{{ url_for('twittertargets', page=page) }}">{{page}}</a></li>{% endif %}{% endfor %}
+{% if TWITTER.has_next %}<li><a href="{{ url_for('twittertargets', page=TWITTER.next_num) }}">&raquo;</a></li>{% else %}{% endif %}
+</ul>
+
             </div>
         </div>
     </div>
 </div>
+
 <script>
-$(document).ready(function() {
-    $('#dataTables-example').DataTable( {
-        stateSave: true,
-        aLengthMenu: [
-        [10,25, 50, 100, -1],
-        [10,25, 50, 100, "All"]],
-        responsive: true,
-        "language": {
-            "lengthMenu": "Show _MENU_ ",
-            "zeroRecords": "found nothing...",
-            "info": "showing _PAGE_ of _PAGES_",
-            "infoEmpty": "No records to show",
-            "infoFiltered": "(filtred from total _MAX_ records)",
-             "paginate": {
-             "first":      "First",
-             "last":       "Last",
-             "next":       "Next",
-             "previous":   "Previous"
-    },
-        "search": "Search",
-        }
-    } );
-} );
- </script>
+function filterTable() {
+  var input, filter, table, tr, td, i;
+  input = document.getElementById("targetInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("targetTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+<script>
+$(document).ready(function()
+    {
+        $("#targetTable").tablesorter();
+    }
+);
+
+</script>
+
+
+
 {% endblock %}

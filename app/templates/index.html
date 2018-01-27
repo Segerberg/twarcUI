@@ -32,7 +32,7 @@
                 </div>
             </div>
         </div>
-        <a href="/twittertargets">
+        <a href="/twittertargets/1">
             <div class="panel-footer">
                 <span class="pull-left">Show</span>
                 <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -55,7 +55,7 @@
                 </div>
             </div>
         </div>
-        <a href="/twittersearchtargets">
+        <a href="/twittersearchtargets/1">
             <div class="panel-footer">
                 <span class="pull-left">Show</span>
                 <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -78,7 +78,7 @@
                 </div>
             </div>
         </div>
-        <a href="/collections">
+        <a href="/collections/1">
             <div class="panel-footer">
                 <span class="pull-left">Show</span>
                 <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -137,7 +137,7 @@
         <div id="collapse3" class="panel-collapse collapse in">
             <div class="panel-body">
                 <div class="list-group">
-                    <span class="list-group-item">Twitter job queue <span class="badge"><span id="q"><i class="fa fa-spinner fa-spin pull-left" aria-hidden="true"></i></span></span>
+                    <span class="list-group-item">Twitter job queue <span class="badge"><i class="fa fa-spinner fa-spin pull-left" aria-hidden="true"></i></span></span>
 
 
 
@@ -194,7 +194,7 @@
 </div>
 
 <script>$('.collapse').collapse()</script>
-                                        <script>
+                                        <!--<script>
                     function update_values() {
                      $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
                      $.getJSON($SCRIPT_ROOT+"/_qmonitor",
@@ -205,6 +205,6 @@
 
         }
 setInterval(update_values, 3000)
-                    </script>
+                    </script>-->
 {% endblock %}
 
