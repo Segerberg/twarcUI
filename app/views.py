@@ -6,6 +6,7 @@ from .forms import twitterTargetForm, SearchForm, twitterCollectionForm, collect
 from sqlalchemy.exc import IntegrityError
 from .twarcUIarchive import twittercrawl
 from .twitterTrends import getTrends
+from .getFollowers import getFollowers
 from .dehydrate import dehydrateUserSearch,dehydrateCollection
 from .wordcloud import wordCloud, wordCloudCollection
 from config import POSTS_PER_PAGE, REDIS_DB, MAP_VIEW,MAP_ZOOM,TARGETS_PER_PAGE
@@ -523,11 +524,11 @@ Route to call simple dehydrate
 '''
 @app.route('/dehydrate/<id>', methods=['GET','POST'])
 def dehydrate(id):
-    if '/twittertargets/' in request.referrer:
+    if '/twittertargets' in request.referrer:
         q.enqueue(dehydrateUserSearch, id, timeout=86400)
         flash(u'Dehydrating, please refresh page!', 'success')
 
-    elif '/collectiondetail/' in request.referrer:
+    elif '/collectiondetail' in request.referrer:
         q.enqueue(dehydrateCollection, id, timeout=86400)
         flash(u'Dehydrating, please refresh page!', 'success')
 
@@ -537,16 +538,17 @@ def dehydrate(id):
     return redirect(request.referrer)
 
 
+
 '''
 Route to call wordCloud
 '''
 @app.route('/wordcloud/<id>', methods=['GET','POST'])
 def wordc(id):
-    if '/twittertargets/' in request.referrer:
+    if '/twittertargets' in request.referrer:
         q.enqueue(wordCloud, id, timeout=86400)
         flash(u'Generating wordcloud, please refresh page!', 'success')
 
-    elif '/collectiondetail/' in request.referrer:
+    elif '/collectiondetail' in request.referrer:
         q.enqueue(wordCloudCollection, id, timeout=86400)
         flash(u'Generating wordcloud, please refresh page!', 'success')
 
