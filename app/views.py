@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from .twarcUIarchive import twittercrawl
 from .twitterTrends import getTrends
 from .getFollowers import Followers
+from.hashtags import hashTags, hashTagsCollection
 from .dehydrate import dehydrateUserSearch,dehydrateCollection
 from .wordcloud import wordCloud, wordCloudCollection
 from config import POSTS_PER_PAGE, REDIS_DB, MAP_VIEW,MAP_ZOOM,TARGETS_PER_PAGE
@@ -233,7 +234,7 @@ def collections(page=1):
             db.session.commit()
             db.session.close()
             back = models.COLLECTION.query.filter(models.COLLECTION.title == collectionForm.title.data).first()
-            return redirect(url_for('collectionDetail', id=back.row_id))
+            return redirect(url_for('collectionDetail', id=back.row_id, page=1))
 
         except IntegrityError:
             flash(u'Collection name is already in use! ', 'danger')
@@ -368,7 +369,7 @@ def collectionDetail(id, page=1):
         except IntegrityError:
             flash(u'Collection name is already in use!  ', 'danger')
             db.session.rollback()
-        return redirect(url_for('collectionDetail',id=id))
+        return redirect(url_for('collectionDetail',id=id, page=1))
 
     if request.method == 'POST' and targetForm.validate_on_submit():
         try:
@@ -388,7 +389,7 @@ def collectionDetail(id, page=1):
         except IntegrityError:
             flash(u'Collection name is already in use!  ', 'danger')
             db.session.rollback()
-        return redirect(url_for('collectionDetail', id=id))
+        return redirect(url_for('collectionDetail', id=id, page=1))
 
 
     if request.method == 'POST' and searchApiForm.validate_on_submit():
@@ -413,7 +414,7 @@ def collectionDetail(id, page=1):
         except IntegrityError:
             flash(u'Collection name is already in use!  ', 'danger')
             db.session.rollback()
-        return redirect(url_for('collectionDetail', id=id))
+        return redirect(url_for('collectionDetail', id=id, page=1))
 
     return render_template("collectiondetail.html",  object = object, collectionForm=collectionForm, targetForm=targetForm,searchApiForm=searchApiForm, linkedTargets=linkedTargets, EXPORTS=EXPORTS)
 
@@ -427,7 +428,7 @@ def addCollectionAssociation(id, target):
     object.tags.append(linkedTarget)
     db.session.commit()
 
-    return redirect(url_for('collectionDetail', id=id))
+    return redirect(url_for('collectionDetail', id=id, page=1))
 
 
 '''
@@ -454,7 +455,7 @@ def removeCollection(id):
     db.session.commit()
     db.session.close()
 
-    return redirect('/collections')
+    return redirect('/collections/1')
 
 '''
 Route to remove collection <--> target association
@@ -529,7 +530,22 @@ def followers(id):
     flash(u'Getting followers, please refresh page!', 'success')
     return redirect(request.referrer)
 
+'''
+Route to call hash
+'''
+@app.route('/hash/<id>', methods=['GET','POST'])
+def hash(id):
+    if '/twittertargets' in request.referrer:
+        q.enqueue(hashTags, id, timeout=86400)
+        flash(u'Getting hashtags, please refresh page!', 'success')
 
+    elif '/collectiondetail' in request.referrer:
+        q.enqueue(hashTagsCollection, id, timeout=86400)
+
+    else:
+        flash(u'Ooops something went wrong!', 'danger')
+
+    return redirect(request.referrer)
 
 '''
 Route to call simple dehydrate 
