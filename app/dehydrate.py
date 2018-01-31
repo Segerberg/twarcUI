@@ -20,7 +20,7 @@ def dehydrateUserSearch(id):
                     tweet = json.loads(line.decode('utf-8'))['id_str']
                     f.write(tweet)
                     f.write('\n')
-    addExportRef = models.EXPORTS(url='{}_simple_dehydrate_UUID_{}.txt'.format(q.title, export_uuid),type='Simple Dehydrate',exported=datetime.utcnow(),count=count)
+    addExportRef = models.EXPORTS(url='{}_simple_dehydrate_UUID_{}.txt'.format(q.title, export_uuid),type='Dehydrate',exported=datetime.now(),count=count)
     q.exports.append(addExportRef)
     db.session.commit()
     db.session.close()
@@ -35,6 +35,8 @@ def dehydrateCollection(id):
         filter(models.COLLECTION.row_id == id). \
         first(). \
         tags
+    dbDateStart = q.inclDateStart
+    dbDateStop = q.inclDateEnd
     with open(os.path.join(EXPORTS_BASEDIR,'{}_simple_dehydrate_UUID_{}.txt'.format(q.title,export_uuid)),'w+') as f:
         for target in linkedTargets:
             print (target.title)
@@ -43,10 +45,13 @@ def dehydrateCollection(id):
                     for line in gzip.open(os.path.join(ARCHIVE_BASEDIR,target.title,filename)):
                         count = count + 1
                         tweet = json.loads(line.decode('utf-8'))['id_str']
-                        f.write(tweet)
-                        f.write('\n')
+                        tweetDate = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
+                        if tweetDate > dbDateStart and tweetDate < dbDateStop:
+                            f.write(tweet)
+                            f.write('\n')
+
     addExportRef = models.EXPORTS(url='{}_simple_dehydrate_UUID_{}.txt'.format(q.title, export_uuid),
-                                  type='Simple Dehydrate', exported=datetime.utcnow(), count=count)
+                                  type='Dehydrate', exported=datetime.now(), count=count)
     q.exports.append(addExportRef)
     db.session.commit()
     db.session.close()
