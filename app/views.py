@@ -7,7 +7,8 @@ from sqlalchemy.exc import IntegrityError
 from .twarcUIarchive import twittercrawl
 from .twitterTrends import getTrends
 from .getFollowers import Followers
-from.hashtags import hashTags, hashTagsCollection
+from .hashtags import hashTags, hashTagsCollection
+from .topusers import topUsers, topUsersCollection
 from .dehydrate import dehydrateUserSearch,dehydrateCollection
 from .wordcloud import wordCloud, wordCloudCollection
 from config import POSTS_PER_PAGE, REDIS_DB, MAP_VIEW,MAP_ZOOM,TARGETS_PER_PAGE
@@ -180,9 +181,6 @@ def removetwittertrend(id):
 def refreshtwittertrend():
     q.enqueue(getTrends)
     return redirect((url_for('twittertrends')))
-
-
-
 
 
 '''API-SEARCH-TARGETS'''
@@ -531,7 +529,7 @@ def followers(id):
     return redirect(request.referrer)
 
 '''
-Route to call hash
+Route to call hashtag report
 '''
 @app.route('/hash/<id>', methods=['GET','POST'])
 def hash(id):
@@ -548,7 +546,24 @@ def hash(id):
     return redirect(request.referrer)
 
 '''
-Route to call simple dehydrate 
+Route to call hash
+'''
+@app.route('/topuser/<id>', methods=['GET','POST'])
+def top_users(id):
+    if '/twittertargets' in request.referrer:
+        q.enqueue(topUsers, id, timeout=86400)
+        flash(u'Getting top users, please refresh page!', 'success')
+
+    elif '/collectiondetail' in request.referrer:
+        q.enqueue(topUsersCollection, id, timeout=86400)
+
+    else:
+        flash(u'Ooops something went wrong!', 'danger')
+
+    return redirect(request.referrer)
+
+'''
+Route to call dehydrate report 
 '''
 @app.route('/dehydrate/<id>', methods=['GET','POST'])
 def dehydrate(id):
