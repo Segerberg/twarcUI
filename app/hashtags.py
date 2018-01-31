@@ -44,6 +44,9 @@ def hashTagsCollection(id):
         filter(models.COLLECTION.row_id == id). \
         first(). \
         tags
+    dbDateStart = q.inclDateStart
+    dbDateStop = q.inclDateEnd
+
     with open(os.path.join(EXPORTS_BASEDIR, '{}_hashtags_UUID_{}.txt'.format(q.title, export_uuid)), 'w+') as f:
         for target in linkedTargets:
             print (target.title)
@@ -53,10 +56,13 @@ def hashTagsCollection(id):
                         if filename.endswith(".gz"):
                             for line in gzip.open(os.path.join(ARCHIVE_BASEDIR,target.title,filename)):
                                 tweet = json.loads(line.decode('utf-8'))
+                                tweetDate = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
                                 for tag in tweet['entities']['hashtags']:
-                                    tags.append(tag['text'].lower())
+                                    if tweetDate > dbDateStart and tweetDate < dbDateStop:
+                                        tags.append(tag['text'].lower())
             except:
                 continue
+
         counts = Counter(tags)
         for t in counts.most_common(10):
             f.write(str(t))
