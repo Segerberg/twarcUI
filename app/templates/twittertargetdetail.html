@@ -31,7 +31,7 @@
                     <li><b style="color:grey"> Keywords:</b> {{ TWITTER.subject }}</li>
                     <li><b style="color:grey"> Description</b> {{ TWITTER.description }}</li>
                     <li><b style="color:grey">Type</b> {{ TWITTER.targetType }}</li>
-                    <li><b style="color:grey">Status</b> {{ TWITTER.status }}</li>
+                    <li><b style="color:grey">Status</b> {% if TWITTER.status == '1' %} Active {% else %} Closed {% endif %}</li>
                     <li><b style="color:grey">Index</b> {{ TWITTER.index }}</li>
                     {% else %}
                     <li><b style="color:grey"> Title:</b> {{ TWITTER.title }}</li>
