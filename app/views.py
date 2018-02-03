@@ -41,7 +41,7 @@ def index():
     if request.method == 'POST':
         return redirect((url_for('search_results', form=form, query=form.search.data)))
 
-    return render_template("index.html", twitterUserCount=twitterUserCount, twitterSearchCount=twitterSearchCount, collectionCount=collectionCount,trendsCount=trendsCount, CRAWLLOG=CRAWLLOG, workers=workers, form=form)
+    return render_template("index.html", twitterUserCount=twitterUserCount, twitterSearchCount=twitterSearchCount, collectionCount=collectionCount,trendsCount=trendsCount, CRAWLLOG=CRAWLLOG, workers=workers, qlen=len(q), form=form)
 
 '''SEARCH'''
 @app.route('/search', methods=['GET', 'POST'])
