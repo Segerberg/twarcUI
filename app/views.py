@@ -67,7 +67,7 @@ TWITTER
 @app.route('/twittertargets/<int:page>', methods=['GET', 'POST'])
 def twittertargets(page=1):
     #TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType=='User')
-    TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType=='User').order_by(models.TWITTER.title).paginate(page, TARGETS_PER_PAGE,False)
+    TWITTER = models.TWITTER.query.filter(models.TWITTER.targetType=='User').order_by(models.TWITTER.title).paginate(page, TARGETS_PER_PAGE,False)
     form = twitterTargetForm(prefix='form')
 
     if request.method == 'POST'and form.validate_on_submit():
@@ -187,7 +187,7 @@ def refreshtwittertrend():
 @app.route('/twittersearchtargets/<int:page>', methods=['GET', 'POST'])
 def twittersearchtargets(page=1):
     #TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType=='Search')
-    TWITTER = models.TWITTER.query.filter(models.TWITTER.status == '1').filter(models.TWITTER.targetType == 'Search').order_by(models.TWITTER.title).paginate(page, TARGETS_PER_PAGE, False)
+    TWITTER = models.TWITTER.query.filter(models.TWITTER.targetType == 'Search').order_by(models.TWITTER.title).paginate(page, TARGETS_PER_PAGE, False)
     templateType = "Search"
     form = twitterTargetForm(prefix='form')
     if request.method == 'POST'and form.validate_on_submit():
@@ -442,6 +442,19 @@ def removeTwitterTarget(id):
         return redirect('/twittersearchtargets/1')
     else:
         return redirect('/twittertargets/1')
+'''
+Route to reactivate twitter-target
+'''
+@app.route('/reactivatetwittertarget/<id>', methods=['GET','POST'])
+def reactivateTwitterTarget(id):
+    object = models.TWITTER.query.get_or_404(id)
+    object.status = 1
+    db.session.commit()
+    if object.targetType == 'Search':
+        return redirect('/twittersearchtargets/1')
+    else:
+        return redirect('/twittertargets/1')
+
 
 '''
 Route to remove collection
